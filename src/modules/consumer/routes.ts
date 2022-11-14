@@ -1,0 +1,10 @@
+import { Router } from "express";
+import isLoggedIn from "../../middleware/authorization/isLoggedIn";
+import * as controllers from "./controllers";
+import * as validations from "./validations";
+
+const router: Router = Router();
+router.route("/register").post(isLoggedIn, validations.create, controllers.register);
+router.route("/search").get(isLoggedIn, controllers.search);
+
+export default router;
