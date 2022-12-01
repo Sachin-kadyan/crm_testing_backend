@@ -32,8 +32,8 @@ export const findOneService = async (query: Object): Promise<CONSUMER> => {
   return consumer as CONSUMER;
 };
 
-export const findServices = async (query: Object): Promise<iService[]> => {
+export const findServices = async (query: Object): Promise<CONSUMER[]> => {
   const database = await getDatabase();
-  const services = await database.collection<iService>(SERVICE_DB).find(query).toArray();
-  return services;
+  const consumers = await database.collection(SERVICE_DB).find(query).toArray();
+  return consumers as CONSUMER[];
 };

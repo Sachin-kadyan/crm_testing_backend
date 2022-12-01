@@ -1,20 +1,31 @@
 import { FUNCTION_RESPONSE } from "../../types/api/api";
-import { CONSUMER } from "../../types/consumer/consumer";
+import { iService } from "../../types/service/service";
 import ErrorHandler from "../../utils/errorHandler";
-import { findOneConsumer, createConsumer, findConsumer } from "./crud";
+import { getAllDepartments } from "../department/functions";
+import { createManyServices, findServices } from "./crud";
 
-const checkExistingConsumer = async (email: string) => {
-  const consumer = await findOneConsumer({ email });
-  if (consumer) throw new ErrorHandler("Consumer Already Exist", 400, [{ error: "Consumer Already Exist" }]);
+export const departmentValidations = async (services: iService[]) => {
+  const { body } = await getAllDepartments();
+  console.log(body);
+  const check = services.every(
+    (item) =>
+      body.some((dept) => dept._id?.toString() === item.department) &&
+      body.some((dept) => dept._id?.toString() === item.departmentType)
+  );
+  console.log(check);
+  if (!check)
+    throw new ErrorHandler("Invalid department or department type passed", 400, [{ error: "invalid department" }]);
 };
 
-export const registerConsumerHandler = async (consumer: CONSUMER): Promise<FUNCTION_RESPONSE> => {
-  await checkExistingConsumer(consumer.email);
-  const registeredConsumer = await createConsumer(consumer);
-  return { status: 200, body: registeredConsumer };
+export const createServiceHandler = async (services: iService[]): Promise<FUNCTION_RESPONSE> => {
+  await departmentValidations(services);
+  const createdServices = await createManyServices(services);
+  return { status: 200, body: createdServices };
 };
 
-export const searchConsumer = async (searchQuery: string): Promise<FUNCTION_RESPONSE> => {
-  const consumers = await findConsumer({ $text: { $search: searchQuery } });
-  return { status: 200, body: consumers };
+export const searchService = async (searchQuery: string, departmentType: string): Promise<FUNCTION_RESPONSE> => {
+  const query: any = { $text: { $search: searchQuery } };
+  departmentType && (query.departmentType = departmentType);
+  const services = await findServices(query);
+  return { status: 200, body: services };
 };

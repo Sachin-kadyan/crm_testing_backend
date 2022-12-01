@@ -1,22 +1,16 @@
 import { body } from "express-validator";
+import { ObjectId } from "mongodb";
 
 export const create = [
-  body("firstName").notEmpty().toLowerCase(),
-  body("lastName").notEmpty().toLowerCase(),
-  body("email").isEmail().toLowerCase(),
-  body("dob").toDate().notEmpty(),
-  body("phone").isMobilePhone("en-IN"),
-  body("uid").notEmpty(),
-  body("gender")
-    .notEmpty()
-    .custom((value, { req }) => {
-      if (value !== "M" && value !== "F" && value !== "O") {
-        throw Error("Invalid Value");
-      }
-      return value;
-    }),
-  body("address.house").notEmpty(),
-  body("address.city").notEmpty(),
-  body("address.state").notEmpty(),
-  body("address.postalCode").notEmpty(),
+  body("*.name").notEmpty().toLowerCase(),
+  body("*.serviceId").notEmpty(),
+  body("*.department").notEmpty(),
+  body("*.departmentType").notEmpty(),
+  body("*.opdCharge").notEmpty().isNumeric(),
+  body("*.ipdCharge").notEmpty().isNumeric(),
+  body("*.fourSharingRoomCharge").notEmpty().isNumeric(),
+  body("*.twinSharingRoomCharge").notEmpty().isNumeric(),
+  body("*.singleRoomCharge").notEmpty().isNumeric(),
+  body("*.deluxeRoomCharge").notEmpty().isNumeric(),
+  body("*.vipRoomCharge").notEmpty().isNumeric(),
 ];

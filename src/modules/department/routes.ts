@@ -5,8 +5,6 @@ import * as controllers from "./controllers";
 import * as validations from "./validations";
 
 const router: Router = Router();
-router.use(isLoggedIn);
-router.route("/").post(validations.create, isLoggedIn, isAdmin, controllers.createService);
-router.route("/search").get(controllers.search);
+router.route("/").post(isLoggedIn, isAdmin, validations.create, controllers.addDepartment);
 
 export default router;

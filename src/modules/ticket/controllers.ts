@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import PromiseWrapper from "../../middleware/promiseWrapper";
-import { createServiceHandler, searchService } from "./functions";
+import { createServiceHandler, searchConsumer } from "./functions";
 
 export const createService = PromiseWrapper(async (req: Request, res: Response, next: NextFunction) => {
   const { status, body } = await createServiceHandler(req.body);
@@ -9,6 +9,6 @@ export const createService = PromiseWrapper(async (req: Request, res: Response, 
 
 export const search = PromiseWrapper(async (req: Request, res: Response, next: NextFunction) => {
   const { search, departmentType } = <{ search: string; departmentType: string }>req.query;
-  const { status, body } = await searchService(search, departmentType);
+  const { status, body } = await searchConsumer(search, departmentType);
   return res.status(status).json(body);
 });
