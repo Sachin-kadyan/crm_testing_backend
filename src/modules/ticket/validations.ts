@@ -2,14 +2,12 @@ import { body } from "express-validator";
 
 export const create = [
   body("consumer").notEmpty(),
-  body("specialty").notEmpty(),
-  body("doctor").notEmpty().toLowerCase(),
-  body("condition").notEmpty().toLowerCase(),
-  body("symptoms").notEmpty().isNumeric(),
-  body("followUp").notEmpty().isNumeric(),
-  body("medicines").notEmpty().isNumeric(),
-  body("diagnostic").notEmpty().isNumeric(),
-  body("singleRoomCharge").notEmpty().isNumeric(),
-  body("deluxeRoomCharge").notEmpty().isNumeric(),
-  body("vipRoomCharge").notEmpty().isNumeric(),
+  body("specialty").notEmpty().isArray({ min: 1 }),
+  body("doctor").notEmpty().isString(),
+  body("condition").notEmpty().isString().toLowerCase(),
+  body("symptoms").notEmpty().isString(),
+  body("followUp").notEmpty().toDate().notEmpty(),
+  body("medicines").optional().isArray(),
+  body("diagnostics").optional().isArray(),
+  body("admission").optional().isString(),
 ];

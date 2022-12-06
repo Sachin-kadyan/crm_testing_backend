@@ -8,4 +8,7 @@ export const create = [
     .isString()
     .notEmpty()
     .customSanitizer((value) => new ObjectId(value)),
+  body("tags.*").optional().isString().notEmpty(),
 ];
+
+export const createDoctor = [body("name").notEmpty().toLowerCase(), body("department.*").notEmpty().isString()];

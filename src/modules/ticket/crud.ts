@@ -1,13 +1,13 @@
 import { CONSUMER } from "../../types/consumer/consumer";
-import { iService } from "../../types/service/service";
+import { iTicket } from "../../types/ticket/ticket";
 import getDatabase from "../../utils/mongo";
 
-export const SERVICE_DB = "service";
+export const TICKET_DB = "ticket";
 
 const createSearchIndex = async () => {
   const database = await getDatabase();
   await database
-    .collection(SERVICE_DB)
+    .collection(TICKET_DB)
     .createIndex({ serviceId: "text", name: "text", department: "text", departmentType: "text" });
 };
 
@@ -15,25 +15,31 @@ const createSearchIndex = async () => {
 
 const createUniqueServiceIndex = async () => {
   const database = await getDatabase();
-  await database.collection(SERVICE_DB).createIndex({ serviceId: 1 }, { unique: true });
+  await database.collection(TICKET_DB).createIndex({ serviceId: 1 }, { unique: true });
 };
 
 // createUniqueServiceIndex();
 
-export const createManyServices = async (services: iService[]): Promise<any> => {
+export const createManyServices = async (services: iTicket[]): Promise<any> => {
   const database = await getDatabase();
-  await database.collection(SERVICE_DB).insertMany(services);
+  await database.collection(TICKET_DB).insertMany(services);
   return services;
+};
+
+export const createOneTicket = async (ticket: iTicket): Promise<iTicket> => {
+  const database = await getDatabase();
+  await database.collection(TICKET_DB).insertOne(ticket);
+  return ticket;
 };
 
 export const findOneService = async (query: Object): Promise<CONSUMER> => {
   const database = await getDatabase();
-  const consumer = await database.collection(SERVICE_DB).findOne(query);
+  const consumer = await database.collection(TICKET_DB).findOne(query);
   return consumer as CONSUMER;
 };
 
 export const findServices = async (query: Object): Promise<CONSUMER[]> => {
   const database = await getDatabase();
-  const consumers = await database.collection(SERVICE_DB).find(query).toArray();
+  const consumers = await database.collection(TICKET_DB).find(query).toArray();
   return consumers as CONSUMER[];
 };

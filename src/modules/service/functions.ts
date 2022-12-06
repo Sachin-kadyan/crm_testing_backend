@@ -6,13 +6,11 @@ import { createManyServices, findServices } from "./crud";
 
 export const departmentValidations = async (services: iService[]) => {
   const { body } = await getAllDepartments();
-  console.log(body);
   const check = services.every(
     (item) =>
-      body.some((dept) => dept._id?.toString() === item.department) &&
-      body.some((dept) => dept._id?.toString() === item.departmentType)
+      body.some((dept) => dept._id?.toString() === item.department && dept.parent === null) &&
+      body.some((dept) => dept._id?.toString() === item.departmentType && dept.parent?.toString() === item.department)
   );
-  console.log(check);
   if (!check)
     throw new ErrorHandler("Invalid department or department type passed", 400, [{ error: "invalid department" }]);
 };

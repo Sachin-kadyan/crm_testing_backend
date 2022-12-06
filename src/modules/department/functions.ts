@@ -1,7 +1,8 @@
+import { query } from "express";
 import { FUNCTION_RESPONSE } from "../../types/api/api";
 import iDepartment from "../../types/department/department";
 import ErrorHandler from "../../utils/errorHandler";
-import { findOneDepartment, createDepartment, findDepartment } from "./crud";
+import { findOneDepartment, createDepartment, findDepartment, insertOneDoctor, findDoctor } from "./crud";
 
 const checkParentExists = async (parent: string) => {
   const department = await findOneDepartment({ _id: parent });
@@ -12,11 +13,39 @@ export const createDepartmentHandler = async (department: iDepartment): Promise<
   if (department.parent) {
     await checkParentExists(department.parent);
   }
+  if (!department.parent) {
+    department.parent = null;
+  }
+  if (!department.tags) {
+    department.tags = [];
+  }
   await createDepartment(department);
   return { status: 200, body: department };
 };
 
-export const getAllDepartments = async() => {
-  const departments = await findDepartment({})
-  return {status : 200, body: departments}
-}
+export const getAllDepartments = async (parent?: boolean) => {
+  const query = parent ? { parent: null } : {};
+  const departments = await findDepartment(query);
+  return { status: 200, body: departments };
+};
+
+export const doctorDepartmentValidation = async (departments: string[]) => {
+  const { body } = await getAllDepartments(); // system departments
+  const check = departments.every((item) => body.some((dept) => dept._id?.toString() === item));
+  if (!check) throw new ErrorHandler("Invalid department", 400, [{ error: "invalid request" }]);
+};
+
+export const createDoctorHandler = async (name: string, departments: string[]) => {
+  await doctorDepartmentValidation(departments);
+  const doctor = await insertOneDoctor({ name, departments });
+  return { status: 200, body: doctor };
+};
+
+export const getDoctorsHandler = async (department: string | undefined, subDepartment: string | undefined) => {
+  const departments = [];
+  if (department) departments.push(department);
+  if (subDepartment) departments.push(subDepartment);
+  const query = departments.length !== 0 ? { departments: { $in: departments } } : {};
+  const doctors = await findDoctor(query);
+  return { status: 200, body: doctors };
+};
