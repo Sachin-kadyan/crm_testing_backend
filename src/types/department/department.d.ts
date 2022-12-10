@@ -10,3 +10,8 @@ export interface iDoctor {
   departments: string[];
   _id?: string;
 }
+
+export interface iTag {
+  name: string;
+  _id?: string;
+}

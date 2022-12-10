@@ -1,10 +1,14 @@
 import { FUNCTION_RESPONSE } from "../../types/api/api";
-import { iService } from "../../types/service/service";
-import { createManyServices, findServices } from "./crud";
+import { iPrescription, iTicket } from "../../types/ticket/ticket";
+import { createOnePrescription, createOneTicket, findServices } from "./crud";
 
-export const createServiceHandler = async (services: iService[]): Promise<FUNCTION_RESPONSE> => {
-  const createdServices = await createManyServices(services);
-  return { status: 200, body: createdServices };
+export const createTicketHandler = async (ticket: iTicket): Promise<FUNCTION_RESPONSE> => {
+  const createdTicket = await createOneTicket(ticket);
+  return { status: 200, body: createdTicket };
+};
+
+export const createPrescription = async (prescription: iPrescription) => {
+  return await createOnePrescription(prescription);
 };
 
 export const searchConsumer = async (searchQuery: string, departmentType: string): Promise<FUNCTION_RESPONSE> => {

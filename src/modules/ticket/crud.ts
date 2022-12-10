@@ -1,8 +1,10 @@
+import { WithId } from "mongodb";
 import { CONSUMER } from "../../types/consumer/consumer";
-import { iTicket } from "../../types/ticket/ticket";
+import { iPrescription, iTicket } from "../../types/ticket/ticket";
 import getDatabase from "../../utils/mongo";
 
 export const TICKET_DB = "ticket";
+export const PRESCRIPTION_DB = "prescription";
 
 const createSearchIndex = async () => {
   const database = await getDatabase();
@@ -42,4 +44,11 @@ export const findServices = async (query: Object): Promise<CONSUMER[]> => {
   const database = await getDatabase();
   const consumers = await database.collection(TICKET_DB).find(query).toArray();
   return consumers as CONSUMER[];
+};
+
+//prescription
+export const createOnePrescription = async (prescription: iPrescription): Promise<iPrescription> => {
+  const database = await getDatabase();
+  await database.collection<iPrescription>(PRESCRIPTION_DB).insertOne(prescription);
+  return prescription;
 };

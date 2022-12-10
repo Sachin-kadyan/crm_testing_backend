@@ -1,3 +1,4 @@
+import { WithId } from "mongodb";
 import { CONSUMER } from "../../types/consumer/consumer";
 import getDatabase from "../../utils/mongo";
 
@@ -18,10 +19,9 @@ export const createConsumer = async (consumer: CONSUMER): Promise<CONSUMER> => {
   return consumer;
 };
 
-export const findOneConsumer = async (query: Object): Promise<CONSUMER> => {
+export const findOneConsumer = async (query: Object): Promise<WithId<CONSUMER> | null> => {
   const database = await getDatabase();
-  const consumer = await database.collection(CONSUMER_DB).findOne(query);
-  return consumer as CONSUMER;
+  return await database.collection<CONSUMER>(CONSUMER_DB).findOne(query);
 };
 
 export const findConsumer = async (query: Object): Promise<CONSUMER[]> => {

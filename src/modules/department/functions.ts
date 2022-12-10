@@ -1,8 +1,18 @@
 import { query } from "express";
+import { ObjectId, WithId } from "mongodb";
 import { FUNCTION_RESPONSE } from "../../types/api/api";
-import iDepartment from "../../types/department/department";
+import iDepartment, { iDoctor } from "../../types/department/department";
 import ErrorHandler from "../../utils/errorHandler";
-import { findOneDepartment, createDepartment, findDepartment, insertOneDoctor, findDoctor } from "./crud";
+import {
+  findOneDepartment,
+  createDepartment,
+  findDepartment,
+  insertOneDoctor,
+  findDoctor,
+  findOneDoctor,
+  insertOneDeptTag,
+  findDeptTag,
+} from "./crud";
 
 const checkParentExists = async (parent: string) => {
   const department = await findOneDepartment({ _id: parent });
@@ -29,6 +39,12 @@ export const getAllDepartments = async (parent?: boolean) => {
   return { status: 200, body: departments };
 };
 
+export const getDepartmentById = async (id: ObjectId): Promise<iDepartment | null> => {
+  return await findOneDepartment({ _id: id });
+};
+
+// doctors
+
 export const doctorDepartmentValidation = async (departments: string[]) => {
   const { body } = await getAllDepartments(); // system departments
   const check = departments.every((item) => body.some((dept) => dept._id?.toString() === item));
@@ -48,4 +64,18 @@ export const getDoctorsHandler = async (department: string | undefined, subDepar
   const query = departments.length !== 0 ? { departments: { $in: departments } } : {};
   const doctors = await findDoctor(query);
   return { status: 200, body: doctors };
+};
+
+export const findDoctorById = async (id: string): Promise<WithId<iDoctor> | null> => {
+  return await findOneDoctor({ _id: id });
+};
+
+// tags
+
+export const createDepartmentTagHandler = async (name: string) => {
+  return await insertOneDeptTag({ name });
+};
+
+export const findAllDepartmentTagsHandler = async () => {
+  return await findDeptTag({});
 };

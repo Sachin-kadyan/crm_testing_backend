@@ -7,7 +7,7 @@ export interface iTicket {
 
 export interface iPrescription {
   consumer: string;
-  specialty: string;
+  departments: string[];
   doctor: string;
   condition: string;
   symptoms: string;

@@ -12,7 +12,7 @@ const app: Express = express();
 const PORT = process.env.PORT;
 
 // app.use(morgan(":method :url :status :res[content-length] - :response-time ms"));
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 

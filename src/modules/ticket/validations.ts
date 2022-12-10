@@ -1,13 +1,21 @@
 import { body } from "express-validator";
+import { ObjectId } from "mongodb";
 
 export const create = [
-  body("consumer").notEmpty(),
-  body("specialty").notEmpty().isArray({ min: 1 }),
-  body("doctor").notEmpty().isString(),
+  body("consumer")
+    .notEmpty()
+    .customSanitizer((value) => {
+      return new ObjectId(value);
+    }),
+  body("departments").notEmpty(),
+  body("doctor")
+    .notEmpty()
+    .customSanitizer((value) => new ObjectId(value))
+    .notEmpty(),
   body("condition").notEmpty().isString().toLowerCase(),
   body("symptoms").notEmpty().isString(),
   body("followUp").notEmpty().toDate().notEmpty(),
-  body("medicines").optional().isArray(),
-  body("diagnostics").optional().isArray(),
-  body("admission").optional().isString(),
+  body("medicines").optional(),
+  body("diagnostics").optional(),
+  body("admission").optional(),
 ];

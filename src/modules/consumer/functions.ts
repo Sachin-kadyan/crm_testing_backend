@@ -8,6 +8,10 @@ const checkExistingConsumer = async (email: string) => {
   if (consumer) throw new ErrorHandler("Consumer Already Exist", 400, [{ error: "Consumer Already Exist" }]);
 };
 
+export const findConsumerById = async (id: string): Promise<CONSUMER | null> => {
+  return await findOneConsumer({ _id: id });
+};
+
 export const registerConsumerHandler = async (consumer: CONSUMER): Promise<FUNCTION_RESPONSE> => {
   await checkExistingConsumer(consumer.email);
   const registeredConsumer = await createConsumer(consumer);

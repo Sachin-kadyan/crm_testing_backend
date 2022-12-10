@@ -1,6 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import PromiseWrapper from "../../middleware/promiseWrapper";
-import { createDepartmentHandler, createDoctorHandler, getAllDepartments, getDoctorsHandler } from "./functions";
+import {
+  createDepartmentHandler,
+  createDoctorHandler,
+  findAllDepartmentTagsHandler,
+  getAllDepartments,
+  getDoctorsHandler,
+} from "./functions";
 
 export const addDepartment = PromiseWrapper(async (req: Request, res: Response, next: NextFunction) => {
   const { status, body } = await createDepartmentHandler(req.body);
@@ -22,4 +28,14 @@ export const getDoctors = PromiseWrapper(async (req: Request, res: Response, nex
   const subDepartment = req.query.subDepartment ? (req.query.subDepartment as string) : undefined;
   const { status, body } = await getDoctorsHandler(department, subDepartment);
   res.status(status).json(body);
+});
+
+export const createDepartmentTag = PromiseWrapper(async (req: Request, res: Response, next: NextFunction) => {
+  const tag = await createDepartmentHandler(req.body.name);
+  res.status(200).json(tag);
+});
+
+export const getDepartmentTags = PromiseWrapper(async (req: Request, res: Response, next: NextFunction) => {
+  const tags = await findAllDepartmentTagsHandler();
+  res.status(200).json(tags);
 });

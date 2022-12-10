@@ -12,3 +12,4 @@ export const create = [
 ];
 
 export const createDoctor = [body("name").notEmpty().toLowerCase(), body("department.*").notEmpty().isString()];
+export const createDepartmentTag = [body("name").notEmpty().toLowerCase()];

@@ -15,4 +15,9 @@ router
   .post(isLoggedIn, isAdmin, validations.createDoctor, controllers.createDoctor)
   .get(isLoggedIn, controllers.getDoctors);
 
+router
+  .route("/tag")
+  .post(isLoggedIn, isAdmin, validations.createDepartmentTag, controllers.createDepartmentTag)
+  .get(isLoggedIn, controllers.getDepartmentTags);
+
 export default router;
