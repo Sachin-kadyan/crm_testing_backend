@@ -28,20 +28,28 @@ export const createManyServices = async (services: iService[]): Promise<any> => 
   return services;
 };
 
+// services
+
+export const findServices = async (query: Object): Promise<CONSUMER[]> => {
+  const database = await getDatabase();
+  const consumers = await database.collection(STAGE_DB).find(query).toArray();
+  return consumers as CONSUMER[];
+};
+
+// stages
 export const createOneStage = async (stage: iStage): Promise<iStage> => {
   const database = await getDatabase();
   await database.collection(STAGE_DB).insertOne(stage);
   return stage;
 };
 
-export const findOneStage = async (query: Object): Promise<WithId<iStage> | null> => {
+export const findOneStage = async (query: object): Promise<WithId<iStage> | null> => {
   const database = await getDatabase();
   const stage = await database.collection<iStage>(STAGE_DB).findOne(query);
   return stage;
 };
 
-export const findServices = async (query: Object): Promise<CONSUMER[]> => {
+export const findStage = async (query: any): Promise<WithId<iStage>[]> => {
   const database = await getDatabase();
-  const consumers = await database.collection(STAGE_DB).find(query).toArray();
-  return consumers as CONSUMER[];
+  return await database.collection<iStage>(STAGE_DB).find(query).toArray();
 };

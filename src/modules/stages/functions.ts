@@ -1,8 +1,8 @@
-import { ObjectId } from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 import { FUNCTION_RESPONSE } from "../../types/api/api";
 import { iStage } from "../../types/stages/stages";
 import ErrorHandler from "../../utils/errorHandler";
-import { createOneStage, findOneStage, findServices } from "./crud";
+import { createOneStage, findOneStage, findServices, findStage } from "./crud";
 
 export const findStageById = async (id: string): Promise<any> => {
   console.log(id);
@@ -13,7 +13,8 @@ export const findStageById = async (id: string): Promise<any> => {
 export const createStageHandler = async (stage: iStage): Promise<FUNCTION_RESPONSE> => {
   if (stage.parent) {
     const check = await findStageById(stage.parent);
-    if (check === null) throw new ErrorHandler("Parent not found", 400, [{ error: "Invalid Parent Id" }]);
+    if (check === null)
+      throw new ErrorHandler("Parent not found", 400, [{ error: "Invalid Parent Id" }]);
   } else {
     stage.parent = null;
   }
@@ -21,7 +22,14 @@ export const createStageHandler = async (stage: iStage): Promise<FUNCTION_RESPON
   return { status: 200, body: createdStage };
 };
 
-export const searchConsumer = async (searchQuery: string, departmentType: string): Promise<FUNCTION_RESPONSE> => {
+export const getAllStagesHandler = async (): Promise<WithId<iStage>[]> => {
+  return await findStage({});
+};
+
+export const searchConsumer = async (
+  searchQuery: string,
+  departmentType: string
+): Promise<FUNCTION_RESPONSE> => {
   const query: any = { $text: { $search: searchQuery } };
   departmentType && (query.departmentType = departmentType);
   const consumers = await findServices(query);

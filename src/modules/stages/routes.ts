@@ -6,7 +6,10 @@ import * as validations from "./validations";
 
 const router: Router = Router();
 router.use(isLoggedIn);
-router.route("/").post(validations.create, isLoggedIn, isAdmin, controllers.createStage);
+router
+  .route("/")
+  .post(validations.create, isAdmin, controllers.createStage)
+  .get(controllers.getAllStages);
 router.route("/search").get(controllers.search);
 
 export default router;
