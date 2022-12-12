@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import { FUNCTION_RESPONSE } from "../../types/api/api";
 import { CONSUMER } from "../../types/consumer/consumer";
 import ErrorHandler from "../../utils/errorHandler";
@@ -8,7 +9,7 @@ const checkExistingConsumer = async (email: string) => {
   if (consumer) throw new ErrorHandler("Consumer Already Exist", 400, [{ error: "Consumer Already Exist" }]);
 };
 
-export const findConsumerById = async (id: string): Promise<CONSUMER | null> => {
+export const findConsumerById = async (id: ObjectId): Promise<CONSUMER | null> => {
   return await findOneConsumer({ _id: id });
 };
 

@@ -8,7 +8,10 @@ const upload = multer();
 
 const router: Router = Router();
 router.use(isLoggedIn);
-router.route("/").post(upload.single("image"), validations.create, controllers.createTicket);
+router
+  .route("/")
+  .post(upload.single("image"), validations.create, controllers.createTicket)
+  .get(controllers.getAllTicket);
 router.route("/search").get(controllers.search);
 
 export default router;

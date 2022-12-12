@@ -57,7 +57,10 @@ export const createDoctorHandler = async (name: string, departments: string[]) =
   return { status: 200, body: doctor };
 };
 
-export const getDoctorsHandler = async (department: string | undefined, subDepartment: string | undefined) => {
+export const getDoctorsHandler = async (
+  department: string | undefined,
+  subDepartment: string | undefined
+) => {
   const departments = [];
   if (department) departments.push(department);
   if (subDepartment) departments.push(subDepartment);
@@ -66,7 +69,7 @@ export const getDoctorsHandler = async (department: string | undefined, subDepar
   return { status: 200, body: doctors };
 };
 
-export const findDoctorById = async (id: string): Promise<WithId<iDoctor> | null> => {
+export const findDoctorById = async (id: ObjectId) => {
   return await findOneDoctor({ _id: id });
 };
 

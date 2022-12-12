@@ -7,6 +7,7 @@ import cors from "cors";
 // import morgan from 'morgan'
 import moduleRoutes from "./modules/routes";
 import ErrorHandler from "./utils/errorHandler";
+import MongoService from "./utils/mongo";
 
 const app: Express = express();
 const PORT = process.env.PORT;
@@ -26,6 +27,7 @@ app.use((err: ErrorHandler, req: Request, res: Response, next: NextFunction) => 
   next();
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
+  await MongoService.init();
   console.log(`server running at ${PORT}`);
 });

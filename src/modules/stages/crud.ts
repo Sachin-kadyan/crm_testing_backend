@@ -2,54 +2,48 @@ import { WithId } from "mongodb";
 import { CONSUMER } from "../../types/consumer/consumer";
 import { iService } from "../../types/service/service";
 import { iStage } from "../../types/stages/stages";
+import MongoService from "../../utils/mongo";
 import getDatabase from "../../utils/mongo";
 
 export const STAGE_DB = "stage";
 
 const createSearchIndex = async () => {
-  const database = await getDatabase();
-  await database
-    .collection(STAGE_DB)
-    .createIndex({ serviceId: "text", name: "text", department: "text", departmentType: "text" });
+  await MongoService.collection(STAGE_DB).createIndex({
+    serviceId: "text",
+    name: "text",
+    department: "text",
+    departmentType: "text",
+  });
 };
 
 // createSearchIndex();
 
 const createUniqueServiceIndex = async () => {
-  const database = await getDatabase();
-  await database.collection(STAGE_DB).createIndex({ serviceId: 1 }, { unique: true });
+  await MongoService.collection(STAGE_DB).createIndex({ serviceId: 1 }, { unique: true });
 };
 
 // createUniqueServiceIndex();
 
 export const createManyServices = async (services: iService[]): Promise<any> => {
-  const database = await getDatabase();
-  await database.collection(STAGE_DB).insertMany(services);
-  return services;
+  return await MongoService.collection(STAGE_DB).insertMany(services);
 };
 
 // services
 
 export const findServices = async (query: Object): Promise<CONSUMER[]> => {
-  const database = await getDatabase();
-  const consumers = await database.collection(STAGE_DB).find(query).toArray();
-  return consumers as CONSUMER[];
+  return await MongoService.collection(STAGE_DB).find<CONSUMER>(query).toArray();
 };
 
 // stages
-export const createOneStage = async (stage: iStage): Promise<iStage> => {
-  const database = await getDatabase();
-  await database.collection(STAGE_DB).insertOne(stage);
+export const createOneStage = async (stage: iStage) => {
+  await MongoService.collection(STAGE_DB).insertOne(stage);
   return stage;
 };
 
-export const findOneStage = async (query: object): Promise<WithId<iStage> | null> => {
-  const database = await getDatabase();
-  const stage = await database.collection<iStage>(STAGE_DB).findOne(query);
-  return stage;
+export const findOneStage = async (query: object) => {
+  return await MongoService.collection(STAGE_DB).findOne<iStage>(query);
 };
 
-export const findStage = async (query: any): Promise<WithId<iStage>[]> => {
-  const database = await getDatabase();
-  return await database.collection<iStage>(STAGE_DB).find(query).toArray();
+export const findStage = async (query: any) => {
+  return await MongoService.collection(STAGE_DB).find<iStage>(query).toArray();
 };

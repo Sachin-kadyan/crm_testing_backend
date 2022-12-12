@@ -6,8 +6,10 @@ import { iPrescription, iTicket } from "../../types/ticket/ticket";
 import ErrorHandler from "../../utils/errorHandler";
 import { findConsumerById } from "../consumer/functions";
 import { findDoctorById, getDepartmentById } from "../department/functions";
+import { getSortedLeadCountRepresentatives } from "../representative/functions";
+import { findStageByCode } from "../stages/functions";
 import { createOnePrescription } from "./crud";
-import { createTicketHandler, searchConsumer } from "./functions";
+import { createTicketHandler, getAllTicketHandler, searchConsumer } from "./functions";
 
 type ticketBody = iTicket & iPrescription;
 
@@ -44,15 +46,27 @@ export const createTicket = PromiseWrapper(async (req: Request, res: Response, n
   prescription.diagnostics = prescription.diagnostics ? [prescription.diagnostics] : null;
   prescription.departments = departments;
   prescription.image = Key;
-  await createOnePrescription(prescription);
+  const { _id } = await createOnePrescription(prescription);
   // finally create ticket
-  const { status, body } = await createTicketHandler({
-    consumer: ticket.consumer,
-    prescription: ticket.prescription,
-    representative: req.user!._id,
-    stage: "",
-  });
-  return res.status(status).json(body);
+  if (!_id) {
+    new ErrorHandler("failed to create prescription", 400, [{ error: "failed to create prescription" }]);
+  } else {
+    const stage = await findStageByCode(0);
+    const representatives = await getSortedLeadCountRepresentatives();
+    const { status, body } = await createTicketHandler({
+      consumer: ticket.consumer,
+      prescription: _id,
+      creator: req.user!._id,
+      assigned: representatives[0]._id,
+      stage: stage._id!,
+    });
+    return res.status(status).json(body);
+  }
+});
+
+export const getAllTicket = PromiseWrapper(async (req: Request, res: Response, next: NextFunction) => {
+  const tickets = await getAllTicketHandler();
+  return res.status(200).json(tickets);
 });
 
 export const search = PromiseWrapper(async (req: Request, res: Response, next: NextFunction) => {

@@ -1,14 +1,19 @@
+import { ObjectId } from "mongodb";
+
 export interface iTicket {
-  consumer: string;
-  stage: string;
-  prescription: string;
-  representative: string;
+  consumer: ObjectId;
+  stage: ObjectId;
+  prescription: ObjectId;
+  creator: ObjectId;
+  assigned: ObjectId;
+  value?: number;
+  highlights?: string[];
 }
 
 export interface iPrescription {
-  consumer: string;
-  departments: string[];
-  doctor: string;
+  consumer: ObjectId;
+  departments: ObjectId[];
+  doctor: ObjectId;
   condition: string;
   symptoms: string;
   followUp: string | number;
@@ -16,4 +21,5 @@ export interface iPrescription {
   medicines: string[] | null;
   diagnostics: string[] | null;
   admission: string | null;
+  _id?: ObjectId;
 }

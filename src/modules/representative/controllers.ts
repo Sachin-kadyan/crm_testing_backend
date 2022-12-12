@@ -3,7 +3,7 @@ import PromiseWrapper from "../../middleware/promiseWrapper";
 import { registerRepresentativeHandler, loginRepresentativeHandler } from "./functions";
 
 export const register = PromiseWrapper(async (req: Request, res: Response, next: NextFunction) => {
-  const { status, body } = await registerRepresentativeHandler(req.body);
+  const { status, body } = await registerRepresentativeHandler({ ...req.body, leadAssignedCount: 0 });
   res.status(status).json(body);
 });
 

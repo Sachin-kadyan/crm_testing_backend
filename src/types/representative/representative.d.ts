@@ -10,6 +10,13 @@ export interface REPRESENTATIVE {
   role: REPRESENTATIVE_ROLES;
   image: string;
   password?: string;
+  leadAssignedCount: number;
 }
 
-export type REPRESENTATIVE_ROLES = "SUPPORT" | "REPRESENTATIVE" | "LEADER" | "MANAGER" | "EXECUTIVE" | "ADMIN";
+export type REPRESENTATIVE_ROLES =
+  | "SUPPORT"
+  | "REPRESENTATIVE"
+  | "LEADER"
+  | "MANAGER"
+  | "EXECUTIVE"
+  | "ADMIN";
