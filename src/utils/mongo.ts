@@ -11,16 +11,16 @@ import { Db, MongoClient } from "mongodb";
 //   }
 //   return database.db(MONGO_DB);
 // };
-
 // export default getDatabase;
-
-export const PRESCRIPTION = "prescription";
-export const CONSUMER = "consumer";
-export const DEPARTMENT = "department";
-export const REPRESENTATIVE = "representative";
-export const SERVICE = "service";
-export const TICKET = "ticket";
-export const STAGE = "stage";
+export const Collections = {
+  PRESCRIPTION: "prescription",
+  CONSUMER: "consumer",
+  DEPARTMENT: "department",
+  REPRESENTATIVE: "representative",
+  SERVICE: "service",
+  TICKET: "ticket",
+  STAGE: "stage",
+};
 
 abstract class MongoService {
   private static _db: Db = null!;
