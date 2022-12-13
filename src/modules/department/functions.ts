@@ -93,3 +93,7 @@ export const createWard = async (ward: iWard, session: ClientSession) => {
 export const getAllWards = async () => {
   return await MongoService.collection(Collections.WARD).find<iWard>({}).toArray();
 };
+
+export const getWardById = async (id: ObjectId) => {
+  return await MongoService.collection(Collections.WARD).findOne<iWard>({ _id: id });
+};
