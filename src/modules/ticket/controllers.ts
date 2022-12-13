@@ -5,7 +5,7 @@ import { putMedia } from "../../services/aws/s3";
 import { iEstimate, iPrescription, iTicket } from "../../types/ticket/ticket";
 import ErrorHandler from "../../utils/errorHandler";
 import { findConsumerById } from "../consumer/functions";
-import { findDoctorById, getDepartmentById } from "../department/functions";
+import { findDoctorById, getDepartmentById, getWardById } from "../department/functions";
 import { getSortedLeadCountRepresentatives } from "../representative/functions";
 import { findStageByCode } from "../stages/functions";
 import { createOnePrescription } from "./crud";
@@ -21,28 +21,26 @@ type ticketBody = iTicket & iPrescription;
 export const createTicket = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
     if (!req.file) {
-      throw new ErrorHandler("Prescription image not found", 400, [
-        { error: "Prescription image not found" },
-      ]);
+      throw new ErrorHandler("Prescription image not found", 400);
     }
     const ticket: ticketBody = req.body;
 
     const consumer = await findConsumerById(ticket.consumer);
     if (consumer === null) {
-      throw new ErrorHandler("consumer doesn't exist", 404, [{ error: "consumer doesn't exist " }]);
+      throw new ErrorHandler("consumer doesn't exist", 404);
     }
     const departments: string[] = JSON.parse(req.body.departments);
     departments.forEach((item) => {
       getDepartmentById(new ObjectId(item)).then((dept) => {
         if (dept === null) {
-          throw new ErrorHandler("Invalid department passed", 400, [{ error: "Invalid department passed" }]);
+          throw new ErrorHandler("Invalid department passed", 400);
         }
       });
     });
 
     const doctor = await findDoctorById(ticket.doctor);
     if (doctor === null) {
-      throw new ErrorHandler("Invalid doctor id passed", 400, [{ error: "Invalid Doctor id passed" }]);
+      throw new ErrorHandler("Invalid doctor id passed", 400);
     }
     const { Key } = await putMedia(req.file, `patients/${ticket.consumer}/prescription`);
     //create prescription
@@ -63,7 +61,7 @@ export const createTicket = PromiseWrapper(
     );
     // finally create ticket
     if (!_id) {
-      new ErrorHandler("failed to create prescription", 400, [{ error: "failed to create prescription" }]);
+      new ErrorHandler("failed to create prescription", 400);
     } else {
       const stage = await findStageByCode(0);
       const representatives = await getSortedLeadCountRepresentatives();
@@ -98,9 +96,11 @@ export const ticketsWithPrescription = PromiseWrapper(
 );
 
 // prescription
-export const createEstimate = PromiseWrapper(
+export const createEstimateController = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
     const estimateBody: iEstimate = req.body;
+    const icuTypeCheck = await getWardById(estimateBody.icuType);
+    if (icuTypeCheck === null) throw new Error("Invalid");
     const tickets = await getConsumerTicketsWithPrescription(new ObjectId(req.params.consumerId));
     return res.status(200).json(tickets);
   }

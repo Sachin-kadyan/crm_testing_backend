@@ -32,7 +32,7 @@ app.get("/", async (req: Request, res: Response) => {
 
 app.use("/api/v1/", moduleRoutes);
 app.use((err: ErrorHandler, req: Request, res: Response, next: NextFunction) => {
-  res.status(err.code).json({ error: err.error, messages: err.messages });
+  res.status(err.code).json({ message: err.message });
   next();
 });
 

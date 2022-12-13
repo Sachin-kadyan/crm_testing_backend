@@ -6,7 +6,7 @@ import { findOneConsumer, createConsumer, findConsumer } from "./crud";
 
 const checkExistingConsumer = async (email: string) => {
   const consumer = await findOneConsumer({ email });
-  if (consumer) throw new ErrorHandler("Consumer Already Exist", 400, [{ error: "Consumer Already Exist" }]);
+  if (consumer) throw new ErrorHandler("Consumer Already Exist", 400);
 };
 
 export const findConsumerById = async (id: ObjectId): Promise<CONSUMER | null> => {

@@ -1,12 +1,10 @@
 class ErrorHandler extends Error {
   code: number;
-  error: string;
-  messages: { error: string }[];
-  constructor(error: string, code: number, messages: { error: string }[]) {
-    super(error);
+  message: string;
+  constructor(message: string, code: number) {
+    super(message);
     this.code = code;
-    this.error = error;
-    this.messages = messages;
+    this.message = message;
   }
 }
 

@@ -17,7 +17,7 @@ export const findStageByCode = async (code: number): Promise<iStage> => {
 export const createStageHandler = async (stage: iStage): Promise<FUNCTION_RESPONSE> => {
   if (stage.parent) {
     const check = await findStageById(stage.parent);
-    if (check === null) throw new ErrorHandler("Parent not found", 400, [{ error: "Invalid Parent Id" }]);
+    if (check === null) throw new ErrorHandler("Parent not found", 400);
   } else {
     stage.parent = null;
   }

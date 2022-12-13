@@ -13,7 +13,7 @@ router
   .post(upload.single("image"), validations.create, controllers.createTicket)
   .get(controllers.getAllTicket);
 router.route("/:consumerId").get(controllers.ticketsWithPrescription);
-router.route("/estimate").post(validations.createEstimate, controllers.createEstimate);
+router.route("/estimate").post(validations.createEstimate, controllers.createEstimateController);
 router.route("/search").get(controllers.search);
 
 export default router;

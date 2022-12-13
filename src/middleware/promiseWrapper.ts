@@ -11,20 +11,12 @@ const PromiseWrapper =
       validationResult(req).throw();
       await session.withTransaction(async () => func(req, res, next, session));
     } catch (error: any) {
-      if (error.messages) {
+      if (error.code) {
         next(error);
-      } else if (error[0]) {
-        next(
-          new ErrorHandler(
-            "VALIDATION_ERROR",
-            403,
-            error.array({ onlyFirstError: true }).map((error: ValidationError) => {
-              return { error: error.msg + " " + error.value + " at " + error.param };
-            })
-          )
-        );
+      } else if (error.errors) {
+        res.status(400).json(error.errors);
       } else {
-        next(new ErrorHandler("SOMETHING WENT WRONG", 500, [{ error: error.message }]));
+        next(new ErrorHandler("SOMETHING WENT WRONG", 500));
       }
     }
   };

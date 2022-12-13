@@ -17,7 +17,7 @@ import {
 
 const checkParentExists = async (parent: string) => {
   const department = await findOneDepartment({ _id: parent });
-  if (!department) throw new ErrorHandler("Invalid Parent", 400, [{ error: "Parent does'nt Exist" }]);
+  if (!department) throw new ErrorHandler("Invalid Parent", 400);
 };
 
 export const createDepartmentHandler = async (department: iDepartment): Promise<FUNCTION_RESPONSE> => {
@@ -49,7 +49,7 @@ export const getDepartmentById = async (id: ObjectId): Promise<iDepartment | nul
 export const doctorDepartmentValidation = async (departments: string[]) => {
   const { body } = await getAllDepartments(); // system departments
   const check = departments.every((item) => body.some((dept) => dept._id?.toString() === item));
-  if (!check) throw new ErrorHandler("Invalid department", 400, [{ error: "invalid request" }]);
+  if (!check) throw new ErrorHandler("Invalid department", 400);
 };
 
 export const createDoctorHandler = async (name: string, departments: string[]) => {

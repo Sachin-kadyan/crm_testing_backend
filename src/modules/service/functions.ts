@@ -9,10 +9,11 @@ export const departmentValidations = async (services: iService[]) => {
   const check = services.every(
     (item) =>
       body.some((dept) => dept._id?.toString() === item.department && dept.parent === null) &&
-      body.some((dept) => dept._id?.toString() === item.departmentType && dept.parent?.toString() === item.department)
+      body.some(
+        (dept) => dept._id?.toString() === item.departmentType && dept.parent?.toString() === item.department
+      )
   );
-  if (!check)
-    throw new ErrorHandler("Invalid department or department type passed", 400, [{ error: "invalid department" }]);
+  if (!check) throw new ErrorHandler("Invalid department or department type passed", 400);
 };
 
 export const createServiceHandler = async (services: iService[]): Promise<FUNCTION_RESPONSE> => {
@@ -21,7 +22,10 @@ export const createServiceHandler = async (services: iService[]): Promise<FUNCTI
   return { status: 200, body: createdServices };
 };
 
-export const searchService = async (searchQuery: string, departmentType: string): Promise<FUNCTION_RESPONSE> => {
+export const searchService = async (
+  searchQuery: string,
+  departmentType: string
+): Promise<FUNCTION_RESPONSE> => {
   const query: any = { $text: { $search: searchQuery } };
   departmentType && (query.departmentType = departmentType);
   const services = await findServices(query);

@@ -19,14 +19,13 @@ const createTokens = (representative: iRepresentative): { access: string; refres
     const access = jwt.sign(representative, accessSecret, { expiresIn: accessValidity });
     return { refresh, access };
   } else {
-    throw new ErrorHandler("Internal server error!", 500, [{ error: "Internal server error" }]);
+    throw new ErrorHandler("Internal server error!", 500);
   }
 };
 
 const checkExistingRepresentative = async (email: string) => {
   const respresentative = await findRepresentative({ email });
-  if (respresentative)
-    throw new ErrorHandler("Representative Already Exist", 400, [{ error: "Representative Already Exist" }]);
+  if (respresentative) throw new ErrorHandler("Representative Already Exist", 400);
 };
 
 export const registerRepresentativeHandler = async (
@@ -45,10 +44,9 @@ export const loginRepresentativeHandler = async (
   password: string
 ): Promise<FUNCTION_RESPONSE> => {
   const representative = await findRepresentative({ email });
-  if (!representative) throw new ErrorHandler("NOT FOUND", 404, [{ error: "Email not registered!" }]);
+  if (!representative) throw new ErrorHandler("NOT FOUND", 404);
   const matchPassword = await bcrypt.compare(password, representative.password as string);
-  if (!matchPassword)
-    throw new ErrorHandler("Incorrect email or password!", 401, [{ error: "Incorrect email or password!" }]);
+  if (!matchPassword) throw new ErrorHandler("Incorrect email or password!", 401);
   delete representative.password;
   const { refresh, access } = createTokens(representative);
   return { status: 200, body: { ...representative, access, refresh } };
