@@ -2,7 +2,7 @@ import { ObjectId, WithId } from "mongodb";
 import { FUNCTION_RESPONSE } from "../../types/api/api";
 import { iStage } from "../../types/stages/stages";
 import ErrorHandler from "../../utils/errorHandler";
-import MongoService, { STAGE } from "../../utils/mongo";
+import MongoService, { Collections } from "../../utils/mongo";
 import { createOneStage, findOneStage, findServices, findStage } from "./crud";
 
 export const findStageById = async (id: string): Promise<any> => {
@@ -11,7 +11,7 @@ export const findStageById = async (id: string): Promise<any> => {
 };
 
 export const findStageByCode = async (code: number): Promise<iStage> => {
-  return (await MongoService.collection(STAGE).findOne<iStage>({ code })) as iStage;
+  return (await MongoService.collection(Collections.STAGE).findOne<iStage>({ code })) as iStage;
 };
 
 export const createStageHandler = async (stage: iStage): Promise<FUNCTION_RESPONSE> => {

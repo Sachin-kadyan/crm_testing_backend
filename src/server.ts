@@ -8,6 +8,7 @@ import cors from "cors";
 import moduleRoutes from "./modules/routes";
 import ErrorHandler from "./utils/errorHandler";
 import MongoService from "./utils/mongo";
+import { createSearchIndex, createUniqueServiceIndex } from "./modules/service/crud";
 
 const app: Express = express();
 const PORT = process.env.PORT;
@@ -29,5 +30,7 @@ app.use((err: ErrorHandler, req: Request, res: Response, next: NextFunction) => 
 
 app.listen(PORT, async () => {
   await MongoService.init();
+  // await createSearchIndex();
+  // await createUniqueServiceIndex();
   console.log(`server running at ${PORT}`);
 });

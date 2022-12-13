@@ -1,7 +1,8 @@
+import { ClientSession, ObjectId } from "mongodb";
 import { FUNCTION_RESPONSE } from "../../types/api/api";
 import { iPrescription, iTicket } from "../../types/ticket/ticket";
-import MongoService, { TICKET } from "../../utils/mongo";
-import { createOnePrescription, createOneTicket, findServices, findTicket } from "./crud";
+import MongoService, { Collections } from "../../utils/mongo";
+import { createOnePrescription, createOneTicket, findServices } from "./crud";
 
 export const createTicketHandler = async (ticket: iTicket): Promise<FUNCTION_RESPONSE> => {
   const createdTicket = await createOneTicket(ticket);
@@ -9,11 +10,26 @@ export const createTicketHandler = async (ticket: iTicket): Promise<FUNCTION_RES
 };
 
 export const getAllTicketHandler = async () => {
-  return await MongoService.collection(TICKET).find({}).toArray();
+  return await MongoService.collection(Collections.TICKET).find({}).toArray();
 };
 
-export const createPrescription = async (prescription: iPrescription) => {
-  return await createOnePrescription(prescription);
+export const getConsumerTicketsWithPrescription = async (consumer: ObjectId) => {
+  const tickets = await MongoService.collection(Collections.TICKET).find<iTicket>({ consumer }).toArray();
+  const consumerPrescriptions = await MongoService.collection(Collections.PRESCRIPTION)
+    .find<iPrescription>({ consumer })
+    .toArray();
+  const consumerTicketsWithPrescription: any = [];
+  consumerPrescriptions.forEach((pres) => {
+    const prescriptionTicket = tickets.find((item) => item.prescription.toString() === pres._id?.toString());
+    if (prescriptionTicket) {
+      consumerTicketsWithPrescription.push({ ...prescriptionTicket, prescription: pres });
+    }
+  });
+  return consumerTicketsWithPrescription;
+};
+
+export const createPrescription = async (prescription: iPrescription, session: ClientSession) => {
+  return await createOnePrescription(prescription, session);
 };
 
 export const searchConsumer = async (

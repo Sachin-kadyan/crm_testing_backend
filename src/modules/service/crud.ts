@@ -3,7 +3,7 @@ import MongoService from "../../utils/mongo";
 
 export const SERVICE_DB = "service";
 
-const createSearchIndex = async () => {
+export const createSearchIndex = async () => {
   await MongoService.collection(SERVICE_DB).createIndex({
     serviceId: "text",
     name: "text",
@@ -14,7 +14,7 @@ const createSearchIndex = async () => {
 
 // createSearchIndex();
 
-const createUniqueServiceIndex = async () => {
+export const createUniqueServiceIndex = async () => {
   await MongoService.collection(SERVICE_DB).createIndex({ serviceId: 1 }, { unique: true });
 };
 

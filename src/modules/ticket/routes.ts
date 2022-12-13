@@ -12,6 +12,7 @@ router
   .route("/")
   .post(upload.single("image"), validations.create, controllers.createTicket)
   .get(controllers.getAllTicket);
+router.route("/:consumerId").get(controllers.ticketsWithPrescription);
 router.route("/search").get(controllers.search);
 
 export default router;

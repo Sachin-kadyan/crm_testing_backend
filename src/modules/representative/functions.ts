@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { FUNCTION_RESPONSE } from "../../types/api/api";
 import { REPRESENTATIVE as iRepresentative } from "../../types/representative/representative";
 import ErrorHandler from "../../utils/errorHandler";
-import MongoService, { REPRESENTATIVE } from "../../utils/mongo";
+import MongoService, { Collections } from "../../utils/mongo";
 import { createRepresentative, findRepresentative, REPRESENTATIVE_DB } from "./crud";
 
 const { accessSecret, refreshSecret, accessValidity, refreshValidity } = process.env;
@@ -55,7 +55,7 @@ export const loginRepresentativeHandler = async (
 };
 
 export const getSortedLeadCountRepresentatives = async () => {
-  return await MongoService.collection(REPRESENTATIVE)
+  return await MongoService.collection(Collections.REPRESENTATIVE)
     .find<iRepresentative>({ role: "REPRESENTATIVE" })
     .sort({ leadAssignedCount: 1 })
     .toArray();

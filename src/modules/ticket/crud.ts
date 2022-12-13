@@ -1,4 +1,4 @@
-import { WithId } from "mongodb";
+import { ClientSession, WithId } from "mongodb";
 import { CONSUMER } from "../../types/consumer/consumer";
 import { iPrescription, iTicket } from "../../types/ticket/ticket";
 import MongoService from "../../utils/mongo";
@@ -51,7 +51,7 @@ export const findTicket = async (query: object): Promise<iTicket[]> => {
 };
 
 //prescription
-export const createOnePrescription = async (prescription: iPrescription): Promise<iPrescription> => {
-  await MongoService.collection(PRESCRIPTION_DB).insertOne(prescription);
+export const createOnePrescription = async (prescription: iPrescription, session: ClientSession) => {
+  await MongoService.collection(PRESCRIPTION_DB).insertOne(prescription, { session });
   return prescription;
 };
