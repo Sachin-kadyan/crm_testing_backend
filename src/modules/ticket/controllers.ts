@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { ClientSession, ObjectId } from "mongodb";
 import PromiseWrapper from "../../middleware/promiseWrapper";
 import { putMedia } from "../../services/aws/s3";
-import { iPrescription, iTicket } from "../../types/ticket/ticket";
+import { iEstimate, iPrescription, iTicket } from "../../types/ticket/ticket";
 import ErrorHandler from "../../utils/errorHandler";
 import { findConsumerById } from "../consumer/functions";
 import { findDoctorById, getDepartmentById } from "../department/functions";
@@ -92,6 +92,15 @@ export const search = PromiseWrapper(async (req: Request, res: Response, next: N
 
 export const ticketsWithPrescription = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
+    const tickets = await getConsumerTicketsWithPrescription(new ObjectId(req.params.consumerId));
+    return res.status(200).json(tickets);
+  }
+);
+
+// prescription
+export const createEstimate = PromiseWrapper(
+  async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
+    const estimateBody: iEstimate = req.body;
     const tickets = await getConsumerTicketsWithPrescription(new ObjectId(req.params.consumerId));
     return res.status(200).json(tickets);
   }

@@ -1,8 +1,9 @@
 import { query } from "express";
-import { ObjectId, WithId } from "mongodb";
+import { ClientSession, ObjectId, WithId } from "mongodb";
 import { FUNCTION_RESPONSE } from "../../types/api/api";
-import iDepartment, { iDoctor } from "../../types/department/department";
+import iDepartment, { iDoctor, iWard } from "../../types/department/department";
 import ErrorHandler from "../../utils/errorHandler";
+import MongoService, { Collections } from "../../utils/mongo";
 import {
   findOneDepartment,
   createDepartment,
@@ -81,4 +82,14 @@ export const createDepartmentTagHandler = async (name: string) => {
 
 export const findAllDepartmentTagsHandler = async () => {
   return await findDeptTag({});
+};
+
+// ward
+export const createWard = async (ward: iWard, session: ClientSession) => {
+  await MongoService.collection(Collections.WARD).insertOne(ward, { session });
+  return ward;
+};
+
+export const getAllWards = async () => {
+  return await MongoService.collection(Collections.WARD).find<iWard>({}).toArray();
 };

@@ -21,4 +21,9 @@ router
   .post(isAdmin, validations.createDepartmentTag, controllers.createDepartmentTag)
   .get(controllers.getDepartmentTags);
 
+router
+  .route("/ward")
+  .post(isAdmin, validations.createWard, controllers.createWardController)
+  .get(controllers.getAllWardsController);
+
 export default router;

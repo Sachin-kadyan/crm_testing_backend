@@ -20,6 +20,7 @@ export const Collections = {
   SERVICE: "service",
   TICKET: "ticket",
   STAGE: "stage",
+  WARD: "ward",
 };
 
 abstract class MongoService {
