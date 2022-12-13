@@ -19,7 +19,7 @@ export const getConsumerTicketsWithPrescription = async (consumer: ObjectId) => 
     .find<iPrescription>({ consumer })
     .toArray();
   const consumerTicketsWithPrescription: any = [];
-  consumerPrescriptions.forEach((pres) => {
+  consumerPrescriptions.forEach((pres) => { 
     const prescriptionTicket = tickets.find((item) => item.prescription.toString() === pres._id?.toString());
     if (prescriptionTicket) {
       consumerTicketsWithPrescription.push({ ...prescriptionTicket, prescription: pres });
