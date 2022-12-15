@@ -21,6 +21,7 @@ export const Collections = {
   TICKET: "ticket",
   STAGE: "stage",
   WARD: "ward",
+  ESTIMATE: "estimate",
 };
 
 abstract class MongoService {

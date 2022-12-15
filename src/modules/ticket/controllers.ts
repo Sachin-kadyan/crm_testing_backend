@@ -7,12 +7,15 @@ import ErrorHandler from "../../utils/errorHandler";
 import { findConsumerById } from "../consumer/functions";
 import { findDoctorById, getDepartmentById, getWardById } from "../department/functions";
 import { getSortedLeadCountRepresentatives } from "../representative/functions";
+import { getServiceById } from "../service/functions";
 import { findStageByCode } from "../stages/functions";
 import { createOnePrescription } from "./crud";
 import {
+  createEstimate,
   createTicketHandler,
   getAllTicketHandler,
   getConsumerTicketsWithPrescription,
+  getPrescriptionById,
   searchConsumer,
 } from "./functions";
 
@@ -95,13 +98,21 @@ export const ticketsWithPrescription = PromiseWrapper(
   }
 );
 
-// prescription
+// estimate
+type iEstimateBody = Omit<iEstimate, "creator">;
+
 export const createEstimateController = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
-    const estimateBody: iEstimate = req.body;
+    const estimateBody: iEstimateBody = req.body;
     const icuTypeCheck = await getWardById(estimateBody.icuType);
-    if (icuTypeCheck === null) throw new Error("Invalid");
-    const tickets = await getConsumerTicketsWithPrescription(new ObjectId(req.params.consumerId));
-    return res.status(200).json(tickets);
+    if (icuTypeCheck === null) throw new ErrorHandler("Invalid ICU Type", 400);
+    estimateBody.service.forEach(async (item) => {
+      const service = await getServiceById(item.id);
+      if (service == null) throw new ErrorHandler("Invalid service Id", 400);
+    });
+    const prescription = await getPrescriptionById(estimateBody.prescription);
+    if (prescription === null) throw new ErrorHandler("Invalid Prescription", 400);
+    const estimate = await createEstimate({ ...estimateBody, creator: new ObjectId(req.user!._id) }, session);
+    return res.status(200).json(estimate);
   }
 );

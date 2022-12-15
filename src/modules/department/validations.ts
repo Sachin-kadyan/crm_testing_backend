@@ -23,11 +23,10 @@ export const createWard = [
     .notEmpty()
     .isNumeric()
     .custom((value, _) => {
-      const types = new Set([1, 2]);
-      if (!types.has(value)) {
+      if (value !== 0 && value !== 1) {
         throw new Error("Invalid Ward Type");
       }
-      return value;
+      return true;
     }),
   body("code").notEmpty().isString(),
   body("roomRent").notEmpty().isNumeric(),

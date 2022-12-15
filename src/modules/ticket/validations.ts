@@ -31,14 +31,12 @@ export const createEstimate = [
     .notEmpty(),
   body("service.*.isSameSite").notEmpty().isBoolean(),
   body("investigation.*")
+    .optional()
     .notEmpty()
     .customSanitizer((value) => new ObjectId(value))
     .notEmpty(),
   body("procedure.*")
-    .notEmpty()
-    .customSanitizer((value) => new ObjectId(value))
-    .notEmpty(),
-  body("creator")
+    .optional()
     .notEmpty()
     .customSanitizer((value) => new ObjectId(value))
     .notEmpty(),
@@ -52,9 +50,10 @@ export const createEstimate = [
     .notEmpty()
     .isNumeric()
     .custom((value, { req }) => {
-      if (value !== 0 || value !== 1) {
-        throw new Error("invalid estimate type");
+      if (value !== 0 && value !== 1) {
+        throw new Error("Invalid estimate type");
       }
+      return true;
     }),
   body("wardDays").notEmpty().isNumeric(),
   body("icuDays").notEmpty().isNumeric(),
@@ -63,17 +62,18 @@ export const createEstimate = [
     .notEmpty()
     .isNumeric()
     .custom((value, { req }) => {
-      if (value !== 0 || value !== 1 || value !== 2) {
-        throw new Error("invalid payment type");
+      if (value !== 0 && value !== 1 && value !== 2) {
+        throw new Error("Invalid payment type");
       }
+      return true;
     }),
-  body("insuranceCompany").notEmpty().isString(),
-  body("insurancePolicyNumber").notEmpty().isString(),
-  body("insurancePolicyAmount").notEmpty().isNumeric(),
-  body("investigationAmount").notEmpty().isNumeric(),
-  body("procedureAmount").notEmpty().isNumeric(),
-  body("medicineAmount").notEmpty().isNumeric(),
-  body("equipmentAmount").notEmpty().isNumeric(),
-  body("bloodAmount").notEmpty().isNumeric(),
-  body("additionalAmount").notEmpty().isNumeric(),
+  body("insuranceCompany").optional().notEmpty().isString(),
+  body("insurancePolicyNumber").optional().notEmpty().isString(),
+  body("insurancePolicyAmount").optional().notEmpty().isNumeric(),
+  body("investigationAmount").optional().notEmpty().isNumeric(),
+  body("procedureAmount").optional().notEmpty().isNumeric(),
+  body("medicineAmount").optional().notEmpty().isNumeric(),
+  body("equipmentAmount").optional().notEmpty().isNumeric(),
+  body("bloodAmount").optional().notEmpty().isNumeric(),
+  body("additionalAmount").optional().notEmpty().isNumeric(),
 ];

@@ -1,6 +1,8 @@
+import { Collection, ObjectId } from "mongodb";
 import { FUNCTION_RESPONSE } from "../../types/api/api";
 import { iService } from "../../types/service/service";
 import ErrorHandler from "../../utils/errorHandler";
+import MongoService, { Collections } from "../../utils/mongo";
 import { getAllDepartments } from "../department/functions";
 import { createManyServices, findServices } from "./crud";
 
@@ -30,4 +32,8 @@ export const searchService = async (
   departmentType && (query.departmentType = departmentType);
   const services = await findServices(query);
   return { status: 200, body: services };
+};
+
+export const getServiceById = async (id: ObjectId) => {
+  return await MongoService.collection(Collections.SERVICE).findOne<iService>({ _id: id });
 };

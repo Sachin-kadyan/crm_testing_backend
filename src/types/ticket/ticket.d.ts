@@ -31,21 +31,21 @@ export interface iEstimate {
   icuType: ObjectId;
   isEmergency: boolean;
   paymentType: number; // 0 cash, 1 insurance, 2 cghs/echg
-  insuranceCompany: string;
-  insurancePolicyNumber: string;
-  insurancePolicyAmount: number;
+  insuranceCompany?: string;
+  insurancePolicyNumber?: string;
+  insurancePolicyAmount?: number;
   service: {
     id: ObjectId;
     isSameSite: boolean;
   }[];
-  investigation: ObjectId[];
-  procedure: ObjectId[];
-  investigationAmount: number;
-  procedureAmount: number;
-  medicineAmount: number;
-  equipmentAmount: number;
-  bloodAmount: number;
-  additionalAmount: number;
+  investigation?: ObjectId[];
+  procedure?: ObjectId[];
+  investigationAmount?: number;
+  procedureAmount?: number;
+  medicineAmount?: number;
+  equipmentAmount?: number;
+  bloodAmount?: number;
+  additionalAmount?: number;
   creator: ObjectId;
   prescription: ObjectId;
   ticket: ObjectId;
