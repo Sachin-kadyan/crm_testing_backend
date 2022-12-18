@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 
 export default interface iDepartment {
   name: string;
-  tags: string[];
+  tags: ObjectId[];
   parent: string | null;
   _id?: ObjectId;
 }

@@ -27,9 +27,7 @@ export const createDepartmentHandler = async (department: iDepartment): Promise<
   if (!department.parent) {
     department.parent = null;
   }
-  if (!department.tags) {
-    department.tags = [];
-  }
+
   await createDepartment(department);
   return { status: 200, body: department };
 };

@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { ClientSession } from "mongodb";
 import PromiseWrapper from "../../middleware/promiseWrapper";
+import ErrorHandler from "../../utils/errorHandler";
 import {
   createDepartmentHandler,
   createDepartmentTagHandler,

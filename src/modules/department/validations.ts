@@ -8,7 +8,9 @@ export const create = [
     .isString()
     .notEmpty()
     .customSanitizer((value) => new ObjectId(value)),
-  body("tags.*").optional().isString().notEmpty(),
+  body("tags.*")
+    .customSanitizer((value) => new ObjectId(value))
+    .notEmpty(),
 ];
 
 export const createDoctor = [
