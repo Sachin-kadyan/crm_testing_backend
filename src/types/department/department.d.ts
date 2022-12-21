@@ -19,6 +19,7 @@ export interface iTag {
 }
 
 export interface iWard {
+  _id?: ObjectId;
   name: string;
   type: number; // 1 ward bed 2 icu bed
   code: string;

@@ -1,7 +1,8 @@
-import { ClientSession, WithId } from "mongodb";
+import { ClientSession, Collection, ObjectId, WithId } from "mongodb";
 import { CONSUMER } from "../../types/consumer/consumer";
+import { iService } from "../../types/service/service";
 import { iPrescription, iTicket } from "../../types/ticket/ticket";
-import MongoService from "../../utils/mongo";
+import MongoService, { Collections } from "../../utils/mongo";
 import getDatabase from "../../utils/mongo";
 
 export const TICKET_DB = "ticket";
@@ -35,9 +36,8 @@ export const findOneService = async (query: Object): Promise<CONSUMER> => {
   return consumer as CONSUMER;
 };
 
-export const findServices = async (query: Object): Promise<CONSUMER[]> => {
-  const consumers = await MongoService.collection(TICKET_DB).find(query).toArray();
-  return consumers as CONSUMER[];
+export const findServices = async (query: Object) => {
+  return await MongoService.collection(Collections.SERVICE).find<iService>(query).toArray();
 };
 
 // ticket
@@ -50,8 +50,18 @@ export const findTicket = async (query: object): Promise<iTicket[]> => {
   return await MongoService.collection(TICKET_DB).find<iTicket>(query).toArray();
 };
 
+export const findTicketById = async (ticketId: ObjectId) => {
+  return await MongoService.collection(Collections.TICKET).findOne<iTicket>({ _id: ticketId });
+};
+
 //prescription
 export const createOnePrescription = async (prescription: iPrescription, session: ClientSession) => {
   await MongoService.collection(PRESCRIPTION_DB).insertOne(prescription, { session });
   return prescription;
+};
+
+export const findPrescriptionById = async (prescriptionId: ObjectId) => {
+  return await MongoService.collection(Collections.PRESCRIPTION).findOne<iPrescription>({
+    _id: prescriptionId,
+  });
 };

@@ -53,3 +53,7 @@ export const createEstimate = async (estimate: iEstimate, session: ClientSession
   await MongoService.collection(Collections.ESTIMATE).insertOne(estimate, { session });
   return estimate;
 };
+
+export const findEstimateById = async (estimateId: ObjectId) => {
+  return await MongoService.collection(Collections.ESTIMATE).findOne<iEstimate>({ _id: estimateId });
+};

@@ -25,6 +25,7 @@ export interface iPrescription {
 }
 
 export interface iEstimate {
+  _id: ObjectId;
   type: number; // 0 packaged, 1 non packaged
   wardDays: number;
   icuDays: number;

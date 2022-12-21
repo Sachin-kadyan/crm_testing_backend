@@ -9,6 +9,9 @@ import moduleRoutes from "./modules/routes";
 import ErrorHandler from "./utils/errorHandler";
 import MongoService from "./utils/mongo";
 import { createSearchIndex, createUniqueServiceIndex } from "./modules/service/crud";
+import { createEstimate } from "./modules/ticket/functions";
+import generateEstimate from "./modules/ticket/estimate/createEstimate";
+import { ObjectId } from "mongodb";
 
 declare global {
   namespace Express {
@@ -32,7 +35,7 @@ app.get("/", async (req: Request, res: Response) => {
 
 app.use("/api/v1/", moduleRoutes);
 app.use((err: ErrorHandler, req: Request, res: Response, next: NextFunction) => {
-  res.status(err.code?err.code: 500).json({ message: err.message });
+  res.status(err.code ? err.code : 500).json({ message: err.message });
   next();
 });
 
@@ -41,4 +44,5 @@ app.listen(PORT, async () => {
   // await createSearchIndex();
   // await createUniqueServiceIndex();
   console.log(`server running at ${PORT}`);
+  // generateEstimate(new ObjectId("639f01ae1e249a18f31779f1"));
 });
