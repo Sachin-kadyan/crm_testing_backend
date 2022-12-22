@@ -1,4 +1,5 @@
 import { ClientSession } from "mongodb";
+import { sendMessage } from "../../services/whatsapp/whatsapp";
 import { iReplyNode } from "../../types/flow/reply";
 import ErrorHandler from "../../utils/errorHandler";
 import MongoService, { Collections } from "../../utils/mongo";
@@ -76,5 +77,6 @@ export const createReplyPayload = (node: iReplyNode) => {
 export const sendReplyNode = async (nodeId: string, phoneNumber: string, withTemplate?: boolean) => {
   const node = await findNodeWithId(nodeId);
   if (node === null) throw new ErrorHandler("Invalid Node", 400);
-  const replyPayload = createReplyPayload();
+  const replyPayload = createReplyPayload(node);
+  await sendMessage(phoneNumber, replyPayload);
 };
