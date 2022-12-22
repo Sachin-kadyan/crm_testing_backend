@@ -1,33 +1,80 @@
+import { NextFunction, Request, Response } from "express";
 import { body } from "express-validator";
 
-export const createReplyNode = [
-  body("*.nodeId").isString().notEmpty(),
-  body("*.nodeName").isString().notEmpty(),
-  body("*.headerType")
-    .isString()
-    .notEmpty()
-    .custom((value, { req }) => {
-      if (
-        value.toLowerCase() === "image" ||
-        value.toLowerCase() === "video" ||
-        value.toLowerCase() === "document"
-      ) {
-        const headerLinkCheck = req.body.every((item: any) => item.headerLink !== "");
-        console.log(headerLinkCheck);
-        if (!headerLinkCheck) {
-          throw new Error("Please specify link in headerLink");
-        }
-      } else if (value.toLowerCase() !== "none") {
-        throw new Error("Please specify header type");
-      }
-      return true;
-    }),
-  body("*.body").optional().isString().isLength({ max: 1024 }),
-  body("*.footer").optional().isString().isLength({ max: 60 }),
-  body("*.replyButton1").notEmpty().isString().isLength({ max: 20, min: 1 }),
-  body("*.replyButtonId1").notEmpty().isString(),
-  body("*.replyButton2").optional().isString().isLength({ max: 20, min: 1 }),
-  body("*.replyButtonId2").optional().notEmpty().isString(),
-  body("*.replyButton3").optional().isString().isLength({ max: 20, min: 1 }),
-  body("*.replyButtonId3").optional().notEmpty().isString(),
-];
+export const createReply = (req: Request, res: Response, next: NextFunction) => {
+  const nodes: {
+    nodeId: string;
+    nodeName: string;
+    headerType: "image" | "document" | "video" | "none";
+    headerLink: string;
+    body: string;
+    footer: string;
+    replyButton1: string;
+    replyButtonId1: string;
+    replyButton2: string;
+    replyButtonId2: string;
+    replyButton3: string;
+    replyButtonId3: string;
+  }[] = req.body;
+
+  nodes.forEach((item, index) => {
+    if (!item.nodeId) throw new Error(`Invalid node id at index ${index}`);
+    if (!item.nodeName) throw new Error(`Invalid node name at index ${index}`);
+    if (
+      item.headerType.toLowerCase() !== "none" &&
+      item.headerType.toLowerCase() !== "image" &&
+      item.headerType.toLowerCase() !== "document" &&
+      item.headerType.toLowerCase() !== "video"
+    ) {
+      throw new Error(`Please specify header type at index ${index}`);
+    }
+    if (item.headerType.toLowerCase() !== "none" && item.headerLink === "") {
+      throw new Error(`Please provide header link at index ${index}`);
+    }
+    if (item.headerType.toLowerCase() === "none") {
+      delete req.body[index].headerType;
+      delete req.body[index].headerLink;
+    }
+    // body
+    if (item.body.length > 1024 || item.body.length === 0) {
+      throw new Error(`body at index ${index} have more than 1024 or 0 characters.`);
+    }
+
+    if (item.body === "") {
+      delete req.body[index].body;
+    }
+
+    // footer
+    if (item.footer.length > 60) {
+      throw new Error(`Footer length cannot be greater than 60 characters at index ${index}`);
+    }
+    if (item.footer.toLowerCase() === "none" || item.footer.length === 0) {
+      delete req.body[index].footer;
+    }
+
+    // reply buttons
+
+    if (item.replyButton1 === "" || item.replyButtonId1 === "") {
+      throw new Error(`Please specify button name or id at index ${index}`);
+    }
+
+    if (item.replyButton1.length > 20) {
+      throw new Error(`Button Name length greater than 20 characters at index ${index}`);
+    }
+    if (item.replyButton2.length > 20) {
+      throw new Error(`Button2 name length greater than 20 characters at index ${index}`);
+    }
+    if (item.replyButton2 === "") {
+      delete req.body[index].replyButton2;
+      delete req.body[index].replyButtonId2;
+    }
+    if (item.replyButton3.length > 20) {
+      throw new Error(`Button2 name length greater than 20 characters at index ${index}`);
+    }
+    if (item.replyButton3 === "") {
+      delete req.body[index].replyButton3;
+      delete req.body[index].replyButtonId3;
+    }
+  });
+  next();
+};
