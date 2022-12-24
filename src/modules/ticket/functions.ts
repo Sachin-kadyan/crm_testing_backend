@@ -13,19 +13,14 @@ export const getAllTicketHandler = async () => {
   return await MongoService.collection(Collections.TICKET).find({}).toArray();
 };
 
-export const getConsumerTicketsWithPrescription = async (consumer: ObjectId) => {
-  const tickets = await MongoService.collection(Collections.TICKET).find<iTicket>({ consumer }).toArray();
-  const consumerPrescriptions = await MongoService.collection(Collections.PRESCRIPTION)
-    .find<iPrescription>({ consumer })
+export const getConsumerTickets = async (consumerId: ObjectId) => {
+  return await MongoService.collection(Collections.TICKET).find<iTicket>({ consumer: consumerId }).toArray();
+};
+
+export const getConsumerPrescriptions = async (consumerId: ObjectId) => {
+  return await MongoService.collection(Collections.PRESCRIPTION)
+    .find<iPrescription>({ consumer: consumerId })
     .toArray();
-  const consumerTicketsWithPrescription: any = [];
-  consumerPrescriptions.forEach((pres) => {
-    const prescriptionTicket = tickets.find((item) => item.prescription.toString() === pres._id?.toString());
-    if (prescriptionTicket) {
-      consumerTicketsWithPrescription.push({ ...prescriptionTicket, prescription: pres });
-    }
-  });
-  return consumerTicketsWithPrescription;
 };
 
 export const createPrescription = async (prescription: iPrescription, session: ClientSession) => {

@@ -14,7 +14,8 @@ import {
   createEstimate,
   createTicketHandler,
   getAllTicketHandler,
-  getConsumerTicketsWithPrescription,
+  getConsumerPrescriptions,
+  getConsumerTickets,
   getPrescriptionById,
   searchConsumer,
 } from "./functions";
@@ -93,8 +94,19 @@ export const search = PromiseWrapper(async (req: Request, res: Response, next: N
 
 export const ticketsWithPrescription = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
-    const tickets = await getConsumerTicketsWithPrescription(new ObjectId(req.params.consumerId));
-    return res.status(200).json(tickets);
+    const tickets = await getConsumerTickets(new ObjectId(req.params.consumerId));
+    const prescriptions = await getConsumerPrescriptions(new ObjectId(req.params.consumerId));
+    // mapping tickets with prescription
+    const consumerTicketsWithPrescription: any = [];
+    prescriptions.forEach((pres) => {
+      const prescriptionTicket = tickets.find(
+        (item) => item.prescription.toString() === pres._id?.toString()
+      );
+      if (prescriptionTicket) {
+        consumerTicketsWithPrescription.push({ ...prescriptionTicket, prescription: pres });
+      }
+    });
+    return res.status(200).json(consumerTicketsWithPrescription);
   }
 );
 
