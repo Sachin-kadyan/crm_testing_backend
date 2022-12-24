@@ -1,6 +1,6 @@
 import { ClientSession } from "mongodb";
 import { sendMessage } from "../../services/whatsapp/whatsapp";
-import { iReplyNode } from "../../types/flow/reply";
+import { iListNode, iReplyNode } from "../../types/flow/reply";
 import ErrorHandler from "../../utils/errorHandler";
 import MongoService, { Collections } from "../../utils/mongo";
 
@@ -8,6 +8,9 @@ export const createReplyNode = async (nodes: iReplyNode[], session: ClientSessio
   return await MongoService.collection(Collections.FLOW).insertMany(nodes, { session });
 };
 
+export const createListNode = async (nodes: iListNode[], session: ClientSession) => {
+  return await MongoService.collection(Collections.FLOW).insertMany(nodes, { session });
+};
 const findNodeWithId = async (nodeId: string) => {
   return await MongoService.collection(Collections.FLOW).findOne<iReplyNode>({ nodeId });
 };

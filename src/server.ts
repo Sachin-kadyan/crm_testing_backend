@@ -46,5 +46,4 @@ app.listen(PORT, async () => {
   // await createUniqueServiceIndex();
   console.log(`server running at ${PORT}`);
   // generateEstimate(new ObjectId("639f01ae1e249a18f31779f1"));
-  // sendReplyNode("HA", "8979877325");
 });
