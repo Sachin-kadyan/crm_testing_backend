@@ -1,5 +1,6 @@
 import { Router } from "express";
 import multer from "multer";
+import { isRepresentative } from "../../middleware/authorization/isAdmin";
 import isLoggedIn from "../../middleware/authorization/isLoggedIn";
 import * as controllers from "./controllers";
 import * as validations from "./validations";
@@ -11,7 +12,7 @@ router.use(isLoggedIn);
 router
   .route("/")
   .post(upload.single("image"), validations.create, controllers.createTicket)
-  .get(controllers.getAllTicket);
+  .get(isRepresentative, controllers.getRepresentativeTickets);
 router.route("/:consumerId").get(controllers.ticketsWithPrescription);
 router.route("/estimate").post(validations.createEstimate, controllers.createEstimateController);
 router.route("/search").get(controllers.search);

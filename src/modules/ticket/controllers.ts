@@ -4,12 +4,13 @@ import PromiseWrapper from "../../middleware/promiseWrapper";
 import { putMedia } from "../../services/aws/s3";
 import { iEstimate, iPrescription, iTicket } from "../../types/ticket/ticket";
 import ErrorHandler from "../../utils/errorHandler";
+import { findConsumer } from "../consumer/crud";
 import { findConsumerById } from "../consumer/functions";
 import { findDoctorById, getDepartmentById, getWardById } from "../department/functions";
 import { getSortedLeadCountRepresentatives } from "../representative/functions";
 import { getServiceById } from "../service/functions";
 import { findStageByCode } from "../stages/functions";
-import { createOnePrescription } from "./crud";
+import { createOnePrescription, findPrescription, findPrescriptionById, findTicket } from "./crud";
 import {
   createEstimate,
   createTicketHandler,
@@ -17,7 +18,7 @@ import {
   getConsumerPrescriptions,
   getConsumerTickets,
   getPrescriptionById,
-  searchConsumer,
+  searchService,
 } from "./functions";
 
 type ticketBody = iTicket & iPrescription;
@@ -88,7 +89,7 @@ export const getAllTicket = PromiseWrapper(async (req: Request, res: Response, n
 
 export const search = PromiseWrapper(async (req: Request, res: Response, next: NextFunction) => {
   const { search, departmentType } = <{ search: string; departmentType: string }>req.query;
-  const { status, body } = await searchConsumer(search, departmentType);
+  const { status, body } = await searchService(search, departmentType);
   return res.status(status).json(body);
 });
 
@@ -107,6 +108,26 @@ export const ticketsWithPrescription = PromiseWrapper(
       }
     });
     return res.status(200).json(consumerTicketsWithPrescription);
+  }
+);
+
+export const getRepresentativeTickets = PromiseWrapper(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const tickets = await findTicket({ creator: new ObjectId(req.user!._id) });
+    const prescriptionIds: ObjectId[] = [];
+    const consumerIds: ObjectId[] = [];
+    tickets.forEach((ticket) => {
+      prescriptionIds.push(ticket.prescription);
+      consumerIds.push(ticket.consumer);
+    });
+    const prescriptions = await findPrescription({ _id: { $in: prescriptionIds } });
+    const consumers = await findConsumer({ _id: { $in: consumerIds } });
+    const populatedTickets: any = [...tickets];
+    tickets.forEach(async (ticket, index) => {
+      populatedTickets[index].prescription = prescriptions[index];
+      populatedTickets[index].consumer = consumers[index];
+    });
+    return res.status(200).json(populatedTickets);
   }
 );
 

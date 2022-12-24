@@ -27,7 +27,7 @@ export const createPrescription = async (prescription: iPrescription, session: C
   return await createOnePrescription(prescription, session);
 };
 
-export const searchConsumer = async (
+export const searchService = async (
   searchQuery: string,
   departmentType: string
 ): Promise<FUNCTION_RESPONSE> => {

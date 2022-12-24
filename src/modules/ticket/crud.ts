@@ -65,3 +65,7 @@ export const findPrescriptionById = async (prescriptionId: ObjectId) => {
     _id: prescriptionId,
   });
 };
+
+export const findPrescription = async (query: any) => {
+  return await MongoService.collection(Collections.PRESCRIPTION).find<iPrescription>(query).toArray();
+};

@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 
 export interface iTicket {
+  _id?: ObjectId;
   consumer: ObjectId;
   stage: ObjectId;
   prescription: ObjectId;
