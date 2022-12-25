@@ -1,4 +1,4 @@
-import { ClientSession, ObjectId } from "mongodb";
+import { ClientSession, Collection, ObjectId } from "mongodb";
 import { FUNCTION_RESPONSE } from "../../types/api/api";
 import { iEstimate, iNote, iPrescription, iTicket } from "../../types/ticket/ticket";
 import MongoService, { Collections } from "../../utils/mongo";
@@ -62,4 +62,8 @@ export const getTicketEstimates = async (ticketId: ObjectId) => {
 export const createNote = async (note: iNote, session: ClientSession) => {
   await MongoService.collection(Collections.Note).insertOne(note, { session });
   return note;
+};
+
+export const getTicketNotes = async (ticketId: ObjectId) => {
+  return await MongoService.collection(Collections.Note).find<iNote>({ ticket: ticketId }).toArray();
 };

@@ -20,6 +20,7 @@ import {
   getConsumerTickets,
   getPrescriptionById,
   getTicketEstimates,
+  getTicketNotes,
   searchService,
 } from "./functions";
 
@@ -172,3 +173,8 @@ export const CreateNote = PromiseWrapper(
     res.status(200).json(note);
   }
 );
+
+export const GetTicketNotes = PromiseWrapper(async (req: Request, res: Response, next: NextFunction) => {
+  const notes = await getTicketNotes(new ObjectId(req.params.ticketId));
+  res.status(200).json(notes);
+});

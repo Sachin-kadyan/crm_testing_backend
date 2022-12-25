@@ -85,5 +85,7 @@ export const create_note = [
   body("ticket")
     .notEmpty()
     .isString()
-    .custom((value) => new ObjectId(value)),
+    .customSanitizer((value) => new ObjectId(value)),
 ];
+
+export const get_notes = [param("ticketId").notEmpty()];
