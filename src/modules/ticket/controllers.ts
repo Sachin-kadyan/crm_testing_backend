@@ -18,6 +18,7 @@ import {
   getConsumerPrescriptions,
   getConsumerTickets,
   getPrescriptionById,
+  getTicketEstimates,
   searchService,
 } from "./functions";
 
@@ -149,3 +150,8 @@ export const createEstimateController = PromiseWrapper(
     return res.status(200).json(estimate);
   }
 );
+
+export const GetTicketEstimates = PromiseWrapper(async (req: Request, res: Response, next: NextFunction) => {
+  const estimates = await getTicketEstimates(new ObjectId(req.params.ticketId));
+  res.status(200).json(estimates);
+});

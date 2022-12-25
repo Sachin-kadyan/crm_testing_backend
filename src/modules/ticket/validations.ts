@@ -1,4 +1,4 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import { ObjectId } from "mongodb";
 
 export const create = [
@@ -77,3 +77,5 @@ export const createEstimate = [
   body("bloodAmount").optional().notEmpty().isNumeric(),
   body("additionalAmount").optional().notEmpty().isNumeric(),
 ];
+
+export const get_estimate = [param("ticketId").notEmpty()];

@@ -52,3 +52,7 @@ export const createEstimate = async (estimate: iEstimate, session: ClientSession
 export const findEstimateById = async (estimateId: ObjectId) => {
   return await MongoService.collection(Collections.ESTIMATE).findOne<iEstimate>({ _id: estimateId });
 };
+
+export const getTicketEstimates = async (ticketId: ObjectId) => {
+  return await MongoService.collection(Collections.ESTIMATE).find<iEstimate>({ ticket: ticketId }).toArray();
+};

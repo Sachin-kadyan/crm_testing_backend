@@ -15,6 +15,7 @@ router
   .get(isRepresentative, controllers.getRepresentativeTickets);
 router.route("/:consumerId").get(controllers.ticketsWithPrescription);
 router.route("/estimate").post(validations.createEstimate, controllers.createEstimateController);
+router.route("/estimate/:ticketId").get(validations.get_estimate, controllers.GetTicketEstimates);
 router.route("/search").get(controllers.search);
 
 export default router;
