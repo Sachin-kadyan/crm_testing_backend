@@ -16,6 +16,5 @@ router
 router.route("/:consumerId").get(controllers.ticketsWithPrescription);
 router.route("/estimate").post(validations.createEstimate, controllers.createEstimateController);
 router.route("/estimate/:ticketId").get(validations.get_estimate, controllers.GetTicketEstimates);
-router.route("/search").get(controllers.search);
-
+router.route("/note").post(validations.create_note, controllers.CreateNote);
 export default router;

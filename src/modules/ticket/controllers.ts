@@ -13,6 +13,7 @@ import { findStageByCode } from "../stages/functions";
 import { createOnePrescription, findPrescription, findPrescriptionById, findTicket } from "./crud";
 import {
   createEstimate,
+  createNote,
   createTicketHandler,
   getAllTicketHandler,
   getConsumerPrescriptions,
@@ -155,3 +156,19 @@ export const GetTicketEstimates = PromiseWrapper(async (req: Request, res: Respo
   const estimates = await getTicketEstimates(new ObjectId(req.params.ticketId));
   res.status(200).json(estimates);
 });
+
+// note
+export const CreateNote = PromiseWrapper(
+  async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
+    const note = await createNote(
+      {
+        text: req.body.text,
+        ticket: req.body.ticket,
+        createdAt: Date.now(),
+        creator: req.user!._id,
+      },
+      session
+    );
+    res.status(200).json(note);
+  }
+);

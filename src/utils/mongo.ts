@@ -23,6 +23,7 @@ export const Collections = {
   WARD: "ward",
   ESTIMATE: "estimate",
   FLOW: "flow",
+  Note: "note",
 };
 
 abstract class MongoService {

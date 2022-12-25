@@ -1,6 +1,6 @@
 import { ClientSession, ObjectId } from "mongodb";
 import { FUNCTION_RESPONSE } from "../../types/api/api";
-import { iEstimate, iPrescription, iTicket } from "../../types/ticket/ticket";
+import { iEstimate, iNote, iPrescription, iTicket } from "../../types/ticket/ticket";
 import MongoService, { Collections } from "../../utils/mongo";
 import { createOnePrescription, createOneTicket, findServices } from "./crud";
 
@@ -55,4 +55,11 @@ export const findEstimateById = async (estimateId: ObjectId) => {
 
 export const getTicketEstimates = async (ticketId: ObjectId) => {
   return await MongoService.collection(Collections.ESTIMATE).find<iEstimate>({ ticket: ticketId }).toArray();
+};
+
+// notes
+
+export const createNote = async (note: iNote, session: ClientSession) => {
+  await MongoService.collection(Collections.Note).insertOne(note, { session });
+  return note;
 };

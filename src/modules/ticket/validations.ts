@@ -79,3 +79,11 @@ export const createEstimate = [
 ];
 
 export const get_estimate = [param("ticketId").notEmpty()];
+
+export const create_note = [
+  body("text").notEmpty().isString(),
+  body("ticket")
+    .notEmpty()
+    .isString()
+    .custom((value) => new ObjectId(value)),
+];

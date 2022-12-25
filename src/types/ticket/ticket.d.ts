@@ -52,3 +52,10 @@ export interface iEstimate {
   prescription: ObjectId;
   ticket: ObjectId;
 }
+
+export interface iNote {
+  text: string;
+  ticket: ObjectId;
+  creator: ObjectId;
+  createdAt: string | number;
+}
