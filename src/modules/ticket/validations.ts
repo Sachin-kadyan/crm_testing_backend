@@ -22,7 +22,7 @@ export const create = [
 
 export const createEstimate = [
   body("icuType")
-    .notEmpty()
+    .optional()
     .customSanitizer((value) => new ObjectId(value))
     .notEmpty(),
   body("service.*.id")
@@ -55,8 +55,16 @@ export const createEstimate = [
       }
       return true;
     }),
-  body("wardDays").notEmpty().isNumeric(),
-  body("icuDays").notEmpty().isNumeric(),
+  body("wardDays").custom((value, { req }) => {
+    if (req.body.type == 1 && !value) {
+      throw new Error("Invalid value at ward days");
+    }
+  }),
+  body("icuDays").custom((value, { req }) => {
+    if (req.body.type == 1 && !value) {
+      throw new Error("Invalid value at ward days");
+    }
+  }),
   body("isEmergency").notEmpty().isBoolean(),
   body("paymentType")
     .notEmpty()

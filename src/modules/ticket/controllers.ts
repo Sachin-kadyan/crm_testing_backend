@@ -140,8 +140,10 @@ type iEstimateBody = Omit<iEstimate, "creator">;
 export const createEstimateController = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
     const estimateBody: iEstimateBody = req.body;
-    const icuTypeCheck = await getWardById(estimateBody.icuType);
-    if (icuTypeCheck === null) throw new ErrorHandler("Invalid ICU Type", 400);
+    if (req.body.icuType) {
+      const icuTypeCheck = await getWardById(estimateBody.icuType);
+      if (icuTypeCheck === null) throw new ErrorHandler("Invalid ICU Type", 400);
+    }
     estimateBody.service.forEach(async (item) => {
       const service = await getServiceById(item.id);
       if (service == null) throw new ErrorHandler("Invalid service Id", 400);
