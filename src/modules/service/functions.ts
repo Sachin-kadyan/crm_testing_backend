@@ -36,12 +36,9 @@ export const createServiceHandler = async (services: iService[]): Promise<FUNCTI
   return { status: 200, body: createdServices };
 };
 
-export const searchService = async (
-  searchQuery: string,
-  departmentType: string
-): Promise<FUNCTION_RESPONSE> => {
+export const searchService = async (searchQuery: string, tag: string): Promise<FUNCTION_RESPONSE> => {
   const query: any = { $text: { $search: searchQuery } };
-  departmentType && (query.departmentType = departmentType);
+  tag && (query.tag = new ObjectId(tag));
   const services = await findServices(query);
   return { status: 200, body: services };
 };

@@ -8,7 +8,7 @@ export const createService = PromiseWrapper(async (req: Request, res: Response, 
 });
 
 export const search = PromiseWrapper(async (req: Request, res: Response, next: NextFunction) => {
-  const { search, departmentType } = <{ search: string; departmentType: string }>req.query;
-  const { status, body } = await searchService(search, departmentType);
+  const { search, tag } = <{ search: string; tag: string }>req.query;
+  const { status, body } = await searchService(search, tag);
   return res.status(status).json(body);
 });
