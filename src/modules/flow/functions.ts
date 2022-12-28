@@ -22,7 +22,6 @@ const findNodeById = async (nodeId: ObjectId) => {
 
 export const findAndSendNode = async (nodeIdentifier: string, receiver: string) => {
   const node = await findNodeWithId(nodeIdentifier);
-  console.log(node);
   if (node !== null && node.type === "reply") {
     const replyPayload = createReplyPayload(node);
     await sendMessage(receiver, replyPayload);
