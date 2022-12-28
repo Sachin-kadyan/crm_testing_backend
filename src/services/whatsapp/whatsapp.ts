@@ -1,24 +1,29 @@
 import axios from "axios";
+import ErrorHandler from "../../utils/errorHandler";
 const { WA_ACCOUNT_ID, WA_TOKEN } = process.env;
 
 const WHATSAPP_URL = `https://graph.facebook.com/v15.0/${WA_ACCOUNT_ID}/messages`;
-
 export const sendMessage = async (receiver: string, payload: any) => {
-  return await axios.post(
-    WHATSAPP_URL,
-    {
-      messaging_product: "whatsapp",
-      recipient_type: "individual",
-      to: `91${receiver}`,
-      ...payload,
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${WA_TOKEN}`,
-        "Content-Type": "application/json",
+  try {
+    const { data } = await axios.post(
+      WHATSAPP_URL,
+      {
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        to: `91${receiver}`,
+        ...payload,
       },
-    }
-  );
+      {
+        headers: {
+          Authorization: `Bearer ${WA_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return data;
+  } catch (error: any) {
+    throw new ErrorHandler(error.response.data.error.message, 500);
+  }
 };
 
 export const sendTemplateMessage = async (
@@ -26,25 +31,30 @@ export const sendTemplateMessage = async (
   templateName: string,
   templateLanguage: string
 ) => {
-  return await axios.post(
-    WHATSAPP_URL,
-    {
-      messaging_product: "whatsapp",
-      recipient_type: "individual",
-      to: `91${receiver}`,
-      type: "template",
-      template: {
-        name: templateName,
-        language: {
-          code: templateLanguage,
+  try {
+    const { data } = await axios.post(
+      WHATSAPP_URL,
+      {
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        to: `91${receiver}`,
+        type: "template",
+        template: {
+          name: templateName,
+          language: {
+            code: templateLanguage,
+          },
         },
       },
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${WA_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-    }
-  );
+      {
+        headers: {
+          Authorization: `Bearer ${WA_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return data;
+  } catch (error: any) {
+    throw new ErrorHandler(error.response.data.error.message, 500);
+  }
 };

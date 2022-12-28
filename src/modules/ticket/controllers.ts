@@ -158,8 +158,8 @@ export const createEstimateController = PromiseWrapper(
     }
     const consumer = await findConsumerById(prescription.consumer);
     const estimate = await createEstimate({ ...estimateBody, creator: new ObjectId(req.user!._id) }, session);
-    console.log(estimate);
-    await generateEstimate(estimate._id); // creates and send estimate pdf
+    // console.log(estimate);
+    // await generateEstimate(estimate._id); // creates and send estimate pdf
 
     const flowConnect = await findFlowConnectorByService(estimateBody.service[0].id); // start flow associated with this service
     if (flowConnect !== null && consumer !== null) {

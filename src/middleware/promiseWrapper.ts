@@ -11,10 +11,11 @@ const PromiseWrapper =
       validationResult(req).throw();
       await session.withTransaction(async () => func(req, res, next, session));
     } catch (error: any) {
+      console.log(error);
       if (error.code) {
         next(error);
       } else if (error.errors) {
-        res.status(400).json(error.errors);
+        return res.status(400).json(error.errors);
       } else {
         next(new ErrorHandler("SOMETHING WENT WRONG", 500));
       }
