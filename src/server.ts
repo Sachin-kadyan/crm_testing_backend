@@ -8,11 +8,6 @@ import cors from "cors";
 import moduleRoutes from "./modules/routes";
 import ErrorHandler from "./utils/errorHandler";
 import MongoService from "./utils/mongo";
-import { createSearchIndex, createUniqueServiceIndex } from "./modules/service/crud";
-import { createEstimate } from "./modules/ticket/functions";
-import generateEstimate from "./modules/ticket/estimate/createEstimate";
-import { ObjectId } from "mongodb";
-import { sendReplyNode } from "./modules/flow/functions";
 
 declare global {
   namespace Express {
@@ -43,14 +38,7 @@ app.use((err: ErrorHandler, req: Request, res: Response, next: NextFunction) => 
 });
 
 MongoService.init().then(() => {
-  app.listen(PORT, () => {
+  app.listen(PORT, async () => {
     console.log(`Server running at ${PORT}`);
   });
 });
-// app.listen(PORT, async () => {
-//   await MongoService.init();
-//   // await createSearchIndex();
-//   // await createUniqueServiceIndex();
-//   console.log(`server running at ${PORT}`);
-//   // generateEstimate(new ObjectId("639f01ae1e249a18f31779f1"));
-// });

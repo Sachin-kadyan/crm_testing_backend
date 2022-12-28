@@ -3,6 +3,7 @@ import { sendMessage, sendTemplateMessage } from "../../services/whatsapp/whatsa
 import { iFlowConnect, iListNode, iReplyNode } from "../../types/flow/reply";
 import ErrorHandler from "../../utils/errorHandler";
 import MongoService, { Collections } from "../../utils/mongo";
+import { createListPayload, createReplyPayload } from "./utils";
 
 export const createReplyNode = async (nodes: iReplyNode[], session: ClientSession) => {
   return await MongoService.collection(Collections.FLOW).insertMany(nodes, { session });
@@ -21,80 +22,13 @@ const findNodeById = async (nodeId: ObjectId) => {
 
 export const findAndSendNode = async (nodeIdentifier: string, receiver: string) => {
   const node = await findNodeWithId(nodeIdentifier);
+  console.log(node);
   if (node !== null && node.type === "reply") {
-    await sendReplyNode(node.nodeId, receiver);
-  } else if (node !== null && node.type === "list") {
-  }
-};
-
-export const createReplyPayload = (node: iReplyNode) => {
-  const payload: {
-    type: string;
-    interactive: {
-      type: "button";
-      body: { text: string };
-      footer?: string;
-      action: {
-        buttons: {
-          type: "reply";
-          reply: {
-            id: string;
-            title: string;
-          };
-        }[];
-      };
-    };
-  } = {
-    type: "interactive",
-    interactive: {
-      type: "button",
-      body: {
-        text: node.body,
-      },
-      action: {
-        buttons: [
-          {
-            type: "reply",
-            reply: {
-              id: node.replyButtonId1,
-              title: node.replyButton1,
-            },
-          },
-        ],
-      },
-    },
-  };
-
-  if (node.footer) {
-    payload.interactive.footer = node.footer;
-  }
-  if (node.replyButton2) {
-    payload.interactive.action.buttons.push({
-      type: "reply",
-      reply: {
-        id: node.replyButtonId2!,
-        title: node.replyButton2,
-      },
-    });
-  }
-  if (node.replyButton3) {
-    payload.interactive.action.buttons.push({
-      type: "reply",
-      reply: {
-        id: node.replyButtonId3!,
-        title: node.replyButton3,
-      },
-    });
-  }
-  return payload;
-};
-
-export const sendReplyNode = async (nodeId: string, phoneNumber: string) => {
-  const node = await findNodeWithId(nodeId);
-  if (node === null) throw new ErrorHandler("Invalid Node", 400);
-  if (node.type === "reply") {
     const replyPayload = createReplyPayload(node);
-    await sendMessage(phoneNumber, replyPayload);
+    await sendMessage(receiver, replyPayload);
+  } else if (node !== null && node.type === "list") {
+    const listPayload = createListPayload(node);
+    await sendMessage(receiver, listPayload);
   }
 };
 
