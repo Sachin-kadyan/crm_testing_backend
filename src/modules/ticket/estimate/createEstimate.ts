@@ -10,16 +10,17 @@ import { putMedia } from "../../../services/aws/s3";
 import { sendMessage } from "../../../services/whatsapp/whatsapp";
 import { whatsappEstimatePayload } from "./utils";
 import { iEstimate, iTicket } from "../../../types/ticket/ticket";
-import { sendReplyNode } from "../../flow/functions";
 const BUCKET_NAME = process.env.PUBLIC_BUCKET_NAME;
 
 const generateEstimate = async (estimateId: ObjectId) => {
+  console.log(estimateId);
   let estimate: iEstimate,
     ticket: iTicket,
     servicesArray: any[] = [],
     investigationArray: any[] = [],
     procedureArray: any[] = [];
   findEstimateById(estimateId).then((res) => {
+    console.log(res);
     if (res === null) throw new ErrorHandler("Invalid estimate", 400);
     estimate = res;
     estimate.service.forEach((item) => {
