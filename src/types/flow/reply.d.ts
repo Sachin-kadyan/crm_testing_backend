@@ -5,6 +5,7 @@ export interface iReplyNode {
   headerLink?: string;
   body: string;
   footer?: string;
+  type: "reply";
   replyButton1: string;
   replyButtonId1: string;
   replyButton2?: string;
@@ -23,6 +24,7 @@ export interface iListNode {
   footer?: string;
   menuTitle: string;
   sectionTitle: string;
+  type: "list";
   // lists
   listId0: string;
   listTitle0: string;

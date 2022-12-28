@@ -77,6 +77,9 @@ export const createReply = (req: Request, res: Response, next: NextFunction) => 
       delete req.body[index].replyButtonId3;
     }
   });
+  req.body.forEach((_: any, index: number) => {
+    req.body[index].type = "reply";
+  });
   next();
 };
 
@@ -236,6 +239,9 @@ export const createList = (req: Request, res: Response, next: NextFunction) => {
       delete req.body[index].listDesc9;
       delete req.body[index].listTitle9;
     }
+  });
+  req.body.forEach((_: any, index: number) => {
+    req.body[index].type = "list";
   });
   next();
 };

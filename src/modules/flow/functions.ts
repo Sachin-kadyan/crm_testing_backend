@@ -1,4 +1,4 @@
-import { ClientSession, ObjectId } from "mongodb";
+import { ClientSession, Collection, ObjectId } from "mongodb";
 import { sendMessage, sendTemplateMessage } from "../../services/whatsapp/whatsapp";
 import { iFlowConnect, iListNode, iReplyNode } from "../../types/flow/reply";
 import ErrorHandler from "../../utils/errorHandler";
@@ -12,7 +12,19 @@ export const createListNode = async (nodes: iListNode[], session: ClientSession)
   return await MongoService.collection(Collections.FLOW).insertMany(nodes, { session });
 };
 const findNodeWithId = async (nodeId: string) => {
-  return await MongoService.collection(Collections.FLOW).findOne<iReplyNode>({ nodeId });
+  return await MongoService.collection(Collections.FLOW).findOne<iReplyNode | iListNode>({ nodeId });
+};
+
+const findNodeById = async (nodeId: ObjectId) => {
+  return await MongoService.collection(Collections.FLOW).findOne<iReplyNode | iListNode>({ _id: nodeId });
+};
+
+export const findAndSendNode = async (nodeIdentifier: string, receiver: string) => {
+  const node = await findNodeWithId(nodeIdentifier);
+  if (node !== null && node.type === "reply") {
+    await sendReplyNode(node.nodeId, receiver);
+  } else if (node !== null && node.type === "list") {
+  }
 };
 
 export const createReplyPayload = (node: iReplyNode) => {
@@ -77,11 +89,13 @@ export const createReplyPayload = (node: iReplyNode) => {
   return payload;
 };
 
-export const sendReplyNode = async (nodeId: string, phoneNumber: string, withTemplate?: boolean) => {
+export const sendReplyNode = async (nodeId: string, phoneNumber: string) => {
   const node = await findNodeWithId(nodeId);
   if (node === null) throw new ErrorHandler("Invalid Node", 400);
-  const replyPayload = createReplyPayload(node);
-  await sendMessage(phoneNumber, replyPayload);
+  if (node.type === "reply") {
+    const replyPayload = createReplyPayload(node);
+    await sendMessage(phoneNumber, replyPayload);
+  }
 };
 
 export const startTemplateFlow = async (templateName: string, templateLanguage: string, receiver: string) => {
@@ -97,4 +111,10 @@ export const connectFlow = async (connector: iFlowConnect, session: ClientSessio
 
 export const findFlowConnectorByService = async (serviceId: ObjectId) => {
   return await MongoService.collection(Collections.FLOW_CONNECT).findOne<iFlowConnect>({ serviceId });
+};
+
+export const findFlowConnectorByTemplateIdentifier = async (templateIdentifier: string) => {
+  return await MongoService.collection(Collections.FLOW_CONNECT).findOne<iFlowConnect>({
+    templateIdentifier,
+  });
 };
