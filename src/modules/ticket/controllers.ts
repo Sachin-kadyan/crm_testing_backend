@@ -146,10 +146,14 @@ export const createEstimateController = PromiseWrapper(
     }
     estimateBody.service.forEach(async (item) => {
       const service = await getServiceById(item.id);
-      if (service == null) throw new ErrorHandler("Invalid service Id", 400);
+      if (service === null) {
+        return res.status(400).json({ message: "Invalid Service Id" });
+      }
     });
     const prescription = await getPrescriptionById(estimateBody.prescription);
-    if (prescription === null) throw new ErrorHandler("Invalid Prescription", 400);
+    if (prescription === null) {
+      throw new ErrorHandler("Invalid Prescription", 400);
+    }
     const estimate = await createEstimate({ ...estimateBody, creator: new ObjectId(req.user!._id) }, session);
     return res.status(200).json(estimate);
   }

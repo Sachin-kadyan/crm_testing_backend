@@ -1,3 +1,4 @@
+import { ObjectID } from "bson";
 import { NextFunction, Request, Response } from "express";
 import { body } from "express-validator";
 
@@ -238,3 +239,18 @@ export const createList = (req: Request, res: Response, next: NextFunction) => {
   });
   next();
 };
+
+export const connect_flow = [
+  body("serviceId")
+    .notEmpty()
+    .isString()
+    .customSanitizer((value) => new ObjectID(value)),
+  body("templateName").notEmpty().isString(),
+  body("templateLanguage").notEmpty().isString(),
+  body("templateIdentifier").notEmpty().isString(),
+  body("nodeIdentifier").notEmpty().isString(),
+  body("nodeId")
+    .notEmpty()
+    .isString()
+    .customSanitizer((value) => new ObjectID(value)),
+];

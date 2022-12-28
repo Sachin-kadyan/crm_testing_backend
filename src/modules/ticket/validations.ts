@@ -56,14 +56,16 @@ export const createEstimate = [
       return true;
     }),
   body("wardDays").custom((value, { req }) => {
-    if (req.body.type == 1 && !value) {
+    if (req.body.type === 1 && !value) {
       throw new Error("Invalid value at ward days");
     }
+    return true;
   }),
   body("icuDays").custom((value, { req }) => {
-    if (req.body.type == 1 && !value) {
+    if (req.body.type === 1 && !value) {
       throw new Error("Invalid value at ward days");
     }
+    return true;
   }),
   body("isEmergency").notEmpty().isBoolean(),
   body("paymentType")

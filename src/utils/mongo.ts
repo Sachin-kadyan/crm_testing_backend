@@ -24,6 +24,7 @@ export const Collections = {
   ESTIMATE: "estimate",
   FLOW: "flow",
   Note: "note",
+  FLOW_CONNECT: "flow_connect",
 };
 
 abstract class MongoService {

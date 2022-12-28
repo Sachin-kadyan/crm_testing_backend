@@ -55,3 +55,12 @@ export interface iListNode {
   listTitle9?: string;
   listDesc9?: string;
 }
+
+export interface iFlowConnect {
+  serviceId: ObjectId;
+  templateName: string;
+  templateLanguage: string;
+  templateIdentifier: string;
+  nodeIdentifier: string;
+  nodeId: ObjectId;
+}
