@@ -16,11 +16,11 @@ export const create = [
     .notEmpty()
     .isString()
     .customSanitizer((value) => new ObjectId(value)),
-  body("*.opdCharge").notEmpty().isNumeric(),
-  body("*.ipdCharge").notEmpty().isNumeric(),
-  body("*.fourSharingRoomCharge").notEmpty().isNumeric(),
-  body("*.twinSharingRoomCharge").notEmpty().isNumeric(),
-  body("*.singleRoomCharge").notEmpty().isNumeric(),
-  body("*.deluxeRoomCharge").notEmpty().isNumeric(),
-  body("*.vipRoomCharge").notEmpty().isNumeric(),
+  body("*.opdCharge").notEmpty().toInt().isNumeric(),
+  body("*.ipdCharge").notEmpty().toInt().isNumeric(),
+  body("*.fourSharingRoomCharge").notEmpty().toInt().isNumeric(),
+  body("*.twinSharingRoomCharge").notEmpty().toInt().isNumeric(),
+  body("*.singleRoomCharge").notEmpty().toInt().isNumeric(),
+  body("*.deluxeRoomCharge").notEmpty().toInt().isNumeric(),
+  body("*.vipRoomCharge").notEmpty().toInt().isNumeric(),
 ];
