@@ -36,14 +36,21 @@ app.get("/", async (req: Request, res: Response) => {
 
 app.use("/api/v1/", moduleRoutes);
 app.use((err: ErrorHandler, req: Request, res: Response, next: NextFunction) => {
-  res.status(err.code ? err.code : 500).json({ message: err.message });
-  next();
+  const status = err.code || 500;
+  const message = err.message || "Internal Server Error";
+  console.log(status, message);
+  return res.status(status).json({ message: message });
 });
 
-app.listen(PORT, async () => {
-  await MongoService.init();
-  // await createSearchIndex();
-  // await createUniqueServiceIndex();
-  console.log(`server running at ${PORT}`);
-  // generateEstimate(new ObjectId("639f01ae1e249a18f31779f1"));
+MongoService.init().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running at ${PORT}`);
+  });
 });
+// app.listen(PORT, async () => {
+//   await MongoService.init();
+//   // await createSearchIndex();
+//   // await createUniqueServiceIndex();
+//   console.log(`server running at ${PORT}`);
+//   // generateEstimate(new ObjectId("639f01ae1e249a18f31779f1"));
+// });
