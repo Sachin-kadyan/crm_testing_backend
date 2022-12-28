@@ -1,5 +1,5 @@
-import { ClientSession } from "mongodb";
-import { sendMessage } from "../../services/whatsapp/whatsapp";
+import { ClientSession, ObjectId } from "mongodb";
+import { sendMessage, sendTemplateMessage } from "../../services/whatsapp/whatsapp";
 import { iFlowConnect, iListNode, iReplyNode } from "../../types/flow/reply";
 import ErrorHandler from "../../utils/errorHandler";
 import MongoService, { Collections } from "../../utils/mongo";
@@ -84,9 +84,17 @@ export const sendReplyNode = async (nodeId: string, phoneNumber: string, withTem
   await sendMessage(phoneNumber, replyPayload);
 };
 
+export const startTemplateFlow = async (templateName: string, templateLanguage: string, receiver: string) => {
+  return await sendTemplateMessage(receiver, templateName, templateLanguage);
+};
+
 // connect flow
 
 export const connectFlow = async (connector: iFlowConnect, session: ClientSession) => {
   await MongoService.collection(Collections.FLOW_CONNECT).insertOne(connector, { session });
   return connector;
+};
+
+export const findFlowConnectorByService = async (serviceId: ObjectId) => {
+  return await MongoService.collection(Collections.FLOW_CONNECT).findOne<iFlowConnect>({ serviceId });
 };

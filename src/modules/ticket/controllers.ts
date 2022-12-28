@@ -7,10 +7,12 @@ import ErrorHandler from "../../utils/errorHandler";
 import { findConsumer } from "../consumer/crud";
 import { findConsumerById } from "../consumer/functions";
 import { findDoctorById, getDepartmentById, getWardById } from "../department/functions";
+import { findFlowConnectorByService, startTemplateFlow } from "../flow/functions";
 import { getSortedLeadCountRepresentatives } from "../representative/functions";
 import { getServiceById } from "../service/functions";
 import { findStageByCode } from "../stages/functions";
 import { createOnePrescription, findPrescription, findPrescriptionById, findTicket } from "./crud";
+import generateEstimate from "./estimate/createEstimate";
 import {
   createEstimate,
   createNote,
@@ -154,7 +156,15 @@ export const createEstimateController = PromiseWrapper(
     if (prescription === null) {
       throw new ErrorHandler("Invalid Prescription", 400);
     }
+    const consumer = await findConsumerById(prescription.consumer);
     const estimate = await createEstimate({ ...estimateBody, creator: new ObjectId(req.user!._id) }, session);
+    console.log(estimate);
+    await generateEstimate(estimate._id); // creates and send estimate pdf
+
+    const flowConnect = await findFlowConnectorByService(estimateBody.service[0].id); // start flow associated with this service
+    if (flowConnect !== null && consumer !== null) {
+      await startTemplateFlow(flowConnect.templateName, flowConnect.templateLanguage, consumer.phone);
+    }
     return res.status(200).json(estimate);
   }
 );
