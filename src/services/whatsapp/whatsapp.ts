@@ -10,7 +10,7 @@ export const sendMessage = async (receiver: string, payload: any) => {
       {
         messaging_product: "whatsapp",
         recipient_type: "individual",
-        to: `91${receiver}`,
+        to: receiver,
         ...payload,
       },
       {
@@ -37,7 +37,7 @@ export const sendTemplateMessage = async (
       {
         messaging_product: "whatsapp",
         recipient_type: "individual",
-        to: `91${receiver}`,
+        to: receiver,
         type: "template",
         template: {
           name: templateName,

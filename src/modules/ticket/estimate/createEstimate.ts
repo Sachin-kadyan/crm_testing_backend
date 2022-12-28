@@ -266,7 +266,7 @@ const generateEstimate = async (estimateId: ObjectId) => {
               mimeType: "application/pdf",
             };
             const { Location } = await putMedia(file, `patients/${estimate.ticket}/estimates`, BUCKET_NAME);
-            await sendMessage(consumer!.phone, whatsappEstimatePayload(Location));
+            await sendMessage(`91${consumer!.phone}`, whatsappEstimatePayload(Location));
           });
         });
       });
