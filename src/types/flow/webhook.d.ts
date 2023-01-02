@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+
 export interface iWebhookPayload {
   object: string;
   entry: {
@@ -20,17 +22,48 @@ export interface iWebhookPayload {
           title: string;
         }[];
         messages: {
-          button?: { payload: any; text: string };
-          interactive?: {
-            type: "button_reply" | "list_reply";
-            button_reply?: { id: string; title: string };
-            list_reply?: { id: string; title: string; description: string };
-          };
-          text?: { body: string };
+          button?: iButtonMessagePayload;
+          interactive?: iReplyMessagePayload | iListMessagePayload;
+          text?: iTextMessagePayload;
         }[];
         statuses: [];
       };
       field: "messages";
     }[];
   }[];
+}
+
+interface iButtonMessagePayload {
+  payload: any;
+  text: string;
+}
+
+interface iReplyMessagePayload {
+  type: "button_reply";
+  button_reply: {
+    id: string;
+    title: string;
+  };
+}
+
+interface iListMessagePayload {
+  type: "list_reply";
+  list_reply: {
+    id: string;
+    title: string;
+    description: string;
+  };
+}
+
+interface iTextMessagePayload {
+  body: string;
+}
+
+interface iTextMessage {
+  text: string;
+  sender: string;
+  type: "received" | "sent";
+  ticket: ObjectId;
+  consumer: ObjectId;
+  messageType: "text";
 }

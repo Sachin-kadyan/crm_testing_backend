@@ -1,4 +1,5 @@
 import { ClientSession, Collection, ObjectId } from "mongodb";
+import { findConsumerFromWAID, saveFlowMessages } from "../../services/whatsapp/webhook";
 import { sendMessage, sendTemplateMessage } from "../../services/whatsapp/whatsapp";
 import { iFlowConnect, iListNode, iReplyNode } from "../../types/flow/reply";
 import ErrorHandler from "../../utils/errorHandler";
@@ -22,13 +23,16 @@ const findNodeById = async (nodeId: ObjectId) => {
 
 export const findAndSendNode = async (nodeIdentifier: string, receiver: string) => {
   const node = await findNodeWithId(nodeIdentifier);
-  if (node !== null && node.type === "reply") {
+  if (node === null) throw new Error("Node not found");
+  if (node.type === "reply") {
     const replyPayload = createReplyPayload(node);
     await sendMessage(receiver, replyPayload);
-  } else if (node !== null && node.type === "list") {
+  } else if (node.type === "list") {
     const listPayload = createListPayload(node);
     await sendMessage(receiver, listPayload);
   }
+  const { ticket } = await findConsumerFromWAID(receiver);
+  await saveFlowMessages(ticket, node._id!);
 };
 
 export const startTemplateFlow = async (templateName: string, templateLanguage: string, receiver: string) => {

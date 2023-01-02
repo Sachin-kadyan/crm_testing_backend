@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { ClientSession } from "mongodb";
 import PromiseWrapper from "../../middleware/promiseWrapper";
+import { saveMessageFromWebhook } from "../../services/whatsapp/webhook";
 import { iWebhookPayload } from "../../types/flow/webhook";
 import ErrorHandler from "../../utils/errorHandler";
 import { findOneService } from "../service/crud";
@@ -41,6 +42,9 @@ export const ConnectFlow = PromiseWrapper(
 export const HandleWebhook = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
     const body: iWebhookPayload = req.body;
+    saveMessageFromWebhook(body); // saving message
+
+    //handling the responses
     body.entry.forEach((entry) => {
       entry.changes.forEach((changes) => {
         changes.value.messages.forEach(async (message, mi) => {
@@ -50,10 +54,11 @@ export const HandleWebhook = PromiseWrapper(
               await findAndSendNode(connector.nodeIdentifier, changes.value.contacts[mi].wa_id);
             }
           } else if (message.interactive) {
-            const nodeIdentifier = message.interactive.button_reply?.id || message.interactive.list_reply?.id;
-            if (nodeIdentifier) {
-              await findAndSendNode(nodeIdentifier, changes.value.contacts[mi].wa_id);
-            }
+            const nodeIdentifier =
+              message.interactive.type === "button_reply"
+                ? message.interactive.button_reply.id
+                : message.interactive.list_reply.id;
+            await findAndSendNode(nodeIdentifier, changes.value.contacts[mi].wa_id);
           }
         });
       });
