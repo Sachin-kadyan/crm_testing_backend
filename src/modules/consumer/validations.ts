@@ -5,7 +5,9 @@ export const create = [
   body("lastName").notEmpty().toLowerCase(),
   body("email").isEmail().toLowerCase(),
   body("dob").toDate().notEmpty(),
-  body("phone").isMobilePhone("en-IN"),
+  body("phone")
+    .isMobilePhone("en-IN")
+    .customSanitizer((value) => "91" + value),
   body("uid").notEmpty(),
   body("gender")
     .notEmpty()
