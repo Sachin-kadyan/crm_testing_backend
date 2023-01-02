@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { ClientSession, ObjectId } from "mongodb";
+import { ClientSession, Collection, ObjectId } from "mongodb";
 import PromiseWrapper from "../../middleware/promiseWrapper";
 import { putMedia } from "../../services/aws/s3";
 import { iEstimate, iPrescription, iTicket } from "../../types/ticket/ticket";
 import ErrorHandler from "../../utils/errorHandler";
+import MongoService, { Collections } from "../../utils/mongo";
 import { findConsumer } from "../consumer/crud";
 import { findConsumerById } from "../consumer/functions";
 import { findDoctorById, getDepartmentById, getWardById } from "../department/functions";
@@ -118,21 +119,33 @@ export const ticketsWithPrescription = PromiseWrapper(
 
 export const getRepresentativeTickets = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
-    const tickets = await findTicket({ creator: new ObjectId(req.user!._id) });
-    const prescriptionIds: ObjectId[] = [];
-    const consumerIds: ObjectId[] = [];
-    tickets.forEach((ticket) => {
-      prescriptionIds.push(ticket.prescription);
-      consumerIds.push(ticket.consumer);
-    });
-    const prescriptions = await findPrescription({ _id: { $in: prescriptionIds } });
-    const consumers = await findConsumer({ _id: { $in: consumerIds } });
-    const populatedTickets: any = [...tickets];
-    tickets.forEach(async (ticket, index) => {
-      populatedTickets[index].prescription = prescriptions[index];
-      populatedTickets[index].consumer = consumers[index];
-    });
-    return res.status(200).json(populatedTickets);
+    // const tickets = await findTicket({ creator: new ObjectId(req.user!._id) });
+    const tickets = await MongoService.collection(Collections.TICKET)
+      .aggregate([
+        {
+          $lookup: {
+            from: Collections.CONSUMER,
+            localField: "consumer",
+            foreignField: "_id",
+            let: { consumer: "$consumer" },
+            pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$consumer"] } } }],
+            as: "consumer",
+          },
+        },
+        {
+          $lookup: {
+            from: Collections.PRESCRIPTION,
+            localField: "prescription",
+            let: { prescription: "$prescription" },
+            pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$prescription"] } } }],
+            foreignField: "_id",
+            as: "prescription",
+          },
+        },
+      ])
+      .toArray();
+
+    return res.status(200).json(tickets);
   }
 );
 
