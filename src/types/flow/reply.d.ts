@@ -1,4 +1,7 @@
+import { ObjectId } from "mongodb";
+
 export interface iReplyNode {
+  _id?: ObjectId;
   nodeId: string;
   nodeName: string;
   headerType?: "image" | "document" | "video";
@@ -15,6 +18,7 @@ export interface iReplyNode {
 }
 
 export interface iListNode {
+  _id?: ObjectId;
   disease: ObjectId;
   nodeId: string;
   nodeName: string;
