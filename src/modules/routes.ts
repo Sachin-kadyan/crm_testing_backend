@@ -7,6 +7,7 @@ import stage from "./stages/routes";
 import ticket from "./ticket/routes";
 import flow from "./flow/routes";
 import script from "./script/routes";
+import task from "./task/routes";
 const router = Router();
 
 router.use("/representative", representative);
@@ -17,5 +18,6 @@ router.use("/stage", stage);
 router.use("/ticket", ticket);
 router.use("/flow", flow);
 router.use("/script", script);
+router.use("/task", task);
 
 export default router;

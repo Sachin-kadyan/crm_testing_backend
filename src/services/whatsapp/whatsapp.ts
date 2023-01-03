@@ -30,30 +30,31 @@ export const sendMessage = async (receiver: string, payload: any) => {
 export const sendTemplateMessage = async (
   receiver: string,
   templateName: string,
-  templateLanguage: string
+  templateLanguage: string,
+  components?: any
 ) => {
   try {
-    const { data } = await axios.post(
-      WHATSAPP_URL,
-      {
-        messaging_product: "whatsapp",
-        recipient_type: "individual",
-        to: receiver,
-        type: "template",
-        template: {
-          name: templateName,
-          language: {
-            code: templateLanguage,
-          },
+    const templatePayload: any = {
+      messaging_product: "whatsapp",
+      recipient_type: "individual",
+      to: receiver,
+      type: "template",
+      template: {
+        name: templateName,
+        language: {
+          code: templateLanguage,
         },
       },
-      {
-        headers: {
-          Authorization: `Bearer ${WA_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    };
+    if (components) {
+      templatePayload.template.components = components;
+    }
+    const { data } = await axios.post(WHATSAPP_URL, templatePayload, {
+      headers: {
+        Authorization: `Bearer ${WA_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+    });
     return data;
   } catch (error: any) {
     throw new ErrorHandler(error.response.data.error.message, 500);
