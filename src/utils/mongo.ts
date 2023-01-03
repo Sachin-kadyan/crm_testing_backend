@@ -14,6 +14,7 @@ export const Collections = {
   Note: "note",
   FLOW_CONNECT: "flow_connect",
   MESSAGES: "messages",
+  SCRIPT: "script",
 };
 
 abstract class MongoService {

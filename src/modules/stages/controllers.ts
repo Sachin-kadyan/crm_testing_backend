@@ -21,3 +21,4 @@ export const getAllStages = PromiseWrapper(
     return res.status(200).json(stages);
   }
 );
+
