@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { ClientSession, ObjectId } from "mongodb";
 import { CONSUMER } from "../../types/consumer/consumer";
 import { iTextMessage, iWebhookPayload } from "../../types/flow/webhook";
 import { iStage } from "../../types/stages/stages";
@@ -62,8 +62,8 @@ export const saveMessageFromWebhook = (payload: iWebhookPayload) => {
   });
 };
 
-export const saveTextMessage = async (message: iTextMessage, sender: string) => {
-  await MongoService.collection(Collections.MESSAGES).insertOne({ message });
+export const saveTextMessage = async (message: iTextMessage, session: ClientSession) => {
+  await MongoService.collection(Collections.MESSAGES).insertOne(message, { session });
 };
 
 export const saveFlowMessages = async (ticket: ObjectId, node: ObjectId) => {
@@ -74,10 +74,11 @@ export const saveFlowMessages = async (ticket: ObjectId, node: ObjectId) => {
   });
 };
 
-export const findConsumerFromWAID = async (sender: string) => {
+export const findConsumerFromWAID = async (consumerWAId: string) => {
   const stages = await MongoService.collection(Collections.STAGE).find<iStage>({}).toArray();
+  console.log(consumerWAId);
   const consumer = await MongoService.collection(Collections.CONSUMER).findOne<CONSUMER>({
-    phone: `/*.${sender}.*/`,
+    phone: consumerWAId,
   });
   if (consumer === null) throw new Error("No Consumer Found");
   const tickets = await MongoService.collection(Collections.TICKET)
@@ -85,7 +86,9 @@ export const findConsumerFromWAID = async (sender: string) => {
       consumer: consumer._id,
     })
     .toArray();
-  const ticket = tickets.find((item) => stages.find((stage) => stage._id === item.stage)!.code < 8);
+  const ticket = tickets.find(
+    (item) => stages.find((stage) => stage._id?.toString() === item.stage.toString())!.code < 8
+  );
   if (!ticket) throw new Error("No Ticket Found");
   return { ticket: ticket._id!, consumer: consumer._id };
 };

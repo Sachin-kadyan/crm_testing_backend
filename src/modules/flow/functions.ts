@@ -4,7 +4,7 @@ import { sendMessage, sendTemplateMessage } from "../../services/whatsapp/whatsa
 import { iFlowConnect, iListNode, iReplyNode } from "../../types/flow/reply";
 import ErrorHandler from "../../utils/errorHandler";
 import MongoService, { Collections } from "../../utils/mongo";
-import { createListPayload, createReplyPayload } from "./utils";
+import { createListPayload, createReplyPayload, createTextPayload } from "./utils";
 
 export const createReplyNode = async (nodes: iReplyNode[], session: ClientSession) => {
   return await MongoService.collection(Collections.FLOW).insertMany(nodes, { session });
@@ -54,4 +54,9 @@ export const findFlowConnectorByTemplateIdentifier = async (templateIdentifier: 
   return await MongoService.collection(Collections.FLOW_CONNECT).findOne<iFlowConnect>({
     templateIdentifier,
   });
+};
+
+export const sendTextMessage = async (message: string, receiver: string, sender: string) => {
+  const textPayload = createTextPayload(message, sender);
+  await sendMessage(receiver, textPayload);
 };

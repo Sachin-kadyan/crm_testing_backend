@@ -22,6 +22,7 @@ export const sendMessage = async (receiver: string, payload: any) => {
     );
     return data;
   } catch (error: any) {
+    console.log(error.response.data.error);
     throw new ErrorHandler(error.response.data.error.message, 500);
   }
 };

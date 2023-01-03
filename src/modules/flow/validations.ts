@@ -260,3 +260,10 @@ export const connect_flow = [
     .isString()
     .customSanitizer((value) => new ObjectID(value)),
 ];
+
+export const send_message = [
+  body("message").isString().notEmpty(),
+  body("consumerId")
+    .notEmpty()
+    .customSanitizer((value) => new ObjectID(value)),
+];

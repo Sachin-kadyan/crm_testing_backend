@@ -1,6 +1,16 @@
 import { header } from "express-validator";
 import { iListNode, iReplyNode } from "../../types/flow/reply";
 
+export const createTextPayload = (message: string, sender: string) => {
+  return {
+    type: "text",
+    text: {
+      preview_url: true,
+      body: `*${sender}*\n ${message}`,
+    },
+  };
+};
+
 export const createReplyPayload = (node: iReplyNode) => {
   const payload: {
     type: string;

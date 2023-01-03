@@ -1,9 +1,15 @@
 import { NextFunction, Request, Response } from "express";
 import { ClientSession } from "mongodb";
 import PromiseWrapper from "../../middleware/promiseWrapper";
-import { saveMessageFromWebhook } from "../../services/whatsapp/webhook";
+import {
+  findConsumerFromWAID,
+  saveMessageFromWebhook,
+  saveTextMessage,
+} from "../../services/whatsapp/webhook";
+import { sendMessage } from "../../services/whatsapp/whatsapp";
 import { iWebhookPayload } from "../../types/flow/webhook";
 import ErrorHandler from "../../utils/errorHandler";
+import { findConsumerById } from "../consumer/functions";
 import { findOneService } from "../service/crud";
 import {
   connectFlow,
@@ -11,7 +17,9 @@ import {
   createReplyNode,
   findAndSendNode,
   findFlowConnectorByTemplateIdentifier,
+  sendTextMessage,
 } from "./functions";
+import { createTextPayload } from "./utils";
 
 export const createReplyNodeController = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
@@ -64,5 +72,29 @@ export const HandleWebhook = PromiseWrapper(
       });
     });
     res.sendStatus(200);
+  }
+);
+
+export const SendMessage = PromiseWrapper(
+  async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
+    const { message, consumerId } = req.body;
+    console.log(consumerId);
+    const consumer = await findConsumerById(consumerId);
+    if (consumer === null) throw new ErrorHandler("Consumer Not Found", 400);
+    const sender = req.user!.firstName + " " + req.user!.lastName;
+    await sendTextMessage(message, consumer.phone, sender);
+    const { ticket } = await findConsumerFromWAID(consumer.phone);
+    saveTextMessage(
+      {
+        consumer: consumer._id,
+        messageType: "text",
+        sender: req.user!._id,
+        text: message,
+        ticket,
+        type: "sent",
+      },
+      session
+    );
+    return res.status(200).json({ message: "message sent." });
   }
 );

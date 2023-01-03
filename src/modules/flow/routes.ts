@@ -9,4 +9,5 @@ router.route("/reply").post(isLoggedIn, validations.createReply, controllers.cre
 router.route("/list").post(isLoggedIn, validations.createList, controllers.createListNodeController);
 router.route("/connect").post(isLoggedIn, isAdmin, validations.connect_flow, controllers.ConnectFlow);
 router.route("/webhook").post(controllers.HandleWebhook);
+router.route("/message").post(isLoggedIn, validations.send_message, controllers.SendMessage);
 export default router;
