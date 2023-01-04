@@ -11,3 +11,14 @@ export const create_reminder = [
     .customSanitizer((value) => new ObjectId(value))
     .notEmpty(),
 ];
+
+export const create_todo = [
+  body("date").notEmpty().isInt().toInt(),
+  body("title").notEmpty().isString(),
+  body("description").notEmpty().isString(),
+  body("ticket")
+    .notEmpty()
+    .isString()
+    .customSanitizer((value) => new ObjectId(value))
+    .notEmpty(),
+];

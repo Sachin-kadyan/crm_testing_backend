@@ -1,7 +1,7 @@
 import { ClientSession } from "mongodb";
 import Schedule from "node-schedule";
 import { sendTemplateMessage } from "../../services/whatsapp/whatsapp";
-import { iReminder } from "../../types/task/task";
+import { iReminder, iTodo } from "../../types/task/task";
 import MongoService, { Collections } from "../../utils/mongo";
 import { createReminderTemplate } from "./utils";
 
@@ -13,4 +13,9 @@ export const createReminder = async (reminder: iReminder, session: ClientSession
   });
   await MongoService.collection(Collections.REMINDER).insertOne(reminder, { session });
   return reminder;
+};
+
+export const createTodo = async (todo: iTodo, session: ClientSession) => {
+  await MongoService.collection(Collections.TODO).insertOne(todo, { session });
+  return todo;
 };

@@ -16,6 +16,7 @@ export const Collections = {
   MESSAGES: "messages",
   SCRIPT: "script",
   REMINDER: "reminder",
+  TODO: "todo",
 };
 
 abstract class MongoService {
