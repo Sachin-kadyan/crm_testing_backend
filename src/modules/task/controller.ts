@@ -11,6 +11,8 @@ import {
   findCreatorTodo,
   findTicketReminders,
   findTicketTodo,
+  findTodoById,
+  updateTodoStatus,
 } from "./functions";
 
 export const CreateReminder = PromiseWrapper(
@@ -64,3 +66,15 @@ export const GetTicketTodo = PromiseWrapper(async (req: Request, res: Response, 
   const todo = await findTicketTodo(new ObjectId(req.params.ticketId));
   res.status(200).json(todo);
 });
+
+export const UpdateTodoStatus = PromiseWrapper(
+  async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
+    const { todoId, status } = req.body;
+    const todo = await findTodoById(todoId);
+    if (todo === null) throw new ErrorHandler("Todo Not Found", 404);
+    if (todo.creator.toString() !== req.user!._id) throw new ErrorHandler("Permission Denied", 401);
+    if (todo.status === status) throw new ErrorHandler("Invalid Request", 400);
+    await updateTodoStatus(todoId, status, session);
+    res.status(200).json({ message: "Status Changed" });
+  }
+);

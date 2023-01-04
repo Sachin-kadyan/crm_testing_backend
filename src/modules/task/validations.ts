@@ -22,3 +22,11 @@ export const create_todo = [
     .customSanitizer((value) => new ObjectId(value))
     .notEmpty(),
 ];
+
+export const update_todo_status = [
+  body("todoId")
+    .notEmpty()
+    .isString()
+    .customSanitizer((value) => new ObjectId(value)),
+  body("status").notEmpty().isBoolean(),
+];

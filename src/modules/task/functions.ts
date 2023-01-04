@@ -37,3 +37,15 @@ export const findCreatorTodo = async (creator: ObjectId) => {
 export const findTicketTodo = async (ticket: ObjectId) => {
   return await MongoService.collection(Collections.TODO).find({ ticket }).toArray();
 };
+
+export const findTodoById = async (_id: ObjectId) => {
+  return await MongoService.collection(Collections.TODO).findOne<iTodo>({ _id });
+};
+
+export const updateTodoStatus = async (_id: ObjectId, status: boolean, session: ClientSession) => {
+  return await MongoService.collection(Collections.TODO).updateOne(
+    { _id },
+    { $set: { status } },
+    { session }
+  );
+};
