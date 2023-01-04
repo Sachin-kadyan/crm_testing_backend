@@ -4,7 +4,7 @@ import PromiseWrapper from "../../middleware/promiseWrapper";
 import { iReminder, iTodo } from "../../types/task/task";
 import ErrorHandler from "../../utils/errorHandler";
 import { findTicketById } from "../ticket/crud";
-import { createReminder, createTodo } from "./functions";
+import { createReminder, createTodo, findCreatorReminders } from "./functions";
 
 export const CreateReminder = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
@@ -16,6 +16,15 @@ export const CreateReminder = PromiseWrapper(
     res.status(200).json(reminder);
   }
 );
+
+export const GetReminder = PromiseWrapper(
+  async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
+    const reminders = await findCreatorReminders(new ObjectId(req.user!._id));
+    res.status(200).json(reminders);
+  }
+);
+
+// todo
 
 export const CreateTodo = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
