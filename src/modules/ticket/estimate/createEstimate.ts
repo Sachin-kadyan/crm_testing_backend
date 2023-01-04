@@ -263,7 +263,7 @@ const generateEstimate = async (estimateId: ObjectId) => {
             const file = {
               originalname: "estimate",
               buffer: Buffer.concat(buffers),
-              mimeType: "application/pdf",
+              mimetype: "application/pdf",
             };
             const { Location } = await putMedia(
               file,
