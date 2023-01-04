@@ -4,7 +4,14 @@ import PromiseWrapper from "../../middleware/promiseWrapper";
 import { iReminder, iTodo } from "../../types/task/task";
 import ErrorHandler from "../../utils/errorHandler";
 import { findTicketById } from "../ticket/crud";
-import { createReminder, createTodo, findCreatorReminders } from "./functions";
+import {
+  createReminder,
+  createTodo,
+  findCreatorReminders,
+  findCreatorTodo,
+  findTicketReminders,
+  findTicketTodo,
+} from "./functions";
 
 export const CreateReminder = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
@@ -24,6 +31,13 @@ export const GetReminder = PromiseWrapper(
   }
 );
 
+export const GetTicketReminders = PromiseWrapper(async (req: Request, res: Response, next: NextFunction) => {
+  const ticket = await findTicketById(new ObjectId(req.params.ticketId));
+  if (ticket === null) throw new ErrorHandler("No Ticket Found", 400);
+  const reminders = await findTicketReminders(new ObjectId(req.params.ticketId));
+  res.status(200).json(reminders);
+});
+
 // todo
 
 export const CreateTodo = PromiseWrapper(
@@ -36,3 +50,17 @@ export const CreateTodo = PromiseWrapper(
     res.status(200).json(todo);
   }
 );
+
+export const GetCreatorTodo = PromiseWrapper(
+  async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
+    const todo = await findCreatorTodo(new ObjectId(req.user!._id));
+    res.status(200).json(todo);
+  }
+);
+
+export const GetTicketTodo = PromiseWrapper(async (req: Request, res: Response, next: NextFunction) => {
+  const ticket = await findTicketById(new ObjectId(req.params.ticketId));
+  if (ticket === null) throw new ErrorHandler("No Ticket Found", 400);
+  const todo = await findTicketTodo(new ObjectId(req.params.ticketId));
+  res.status(200).json(todo);
+});

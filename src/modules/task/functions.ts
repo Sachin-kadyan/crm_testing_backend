@@ -19,7 +19,21 @@ export const findCreatorReminders = async (creator: ObjectId) => {
   return await MongoService.collection(Collections.REMINDER).find({ creator }).toArray();
 };
 
+export const findTicketReminders = async (ticket: ObjectId) => {
+  return await MongoService.collection(Collections.REMINDER).find({ ticket }).toArray();
+};
+
+// todo
+
 export const createTodo = async (todo: iTodo, session: ClientSession) => {
   await MongoService.collection(Collections.TODO).insertOne(todo, { session });
   return todo;
+};
+
+export const findCreatorTodo = async (creator: ObjectId) => {
+  return await MongoService.collection(Collections.TODO).find({ creator }).toArray();
+};
+
+export const findTicketTodo = async (ticket: ObjectId) => {
+  return await MongoService.collection(Collections.TODO).find({ ticket }).toArray();
 };
