@@ -46,3 +46,7 @@ export const searchService = async (searchQuery: string, tag: string): Promise<F
 export const getServiceById = async (id: ObjectId) => {
   return await MongoService.collection(Collections.SERVICE).findOne<iService>({ _id: id });
 };
+
+export const getAllServices = async () => {
+  return await MongoService.collection(Collections.SERVICE).find<iService>({}).toArray();
+};
