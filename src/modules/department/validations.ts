@@ -3,11 +3,14 @@ import { ObjectId } from "mongodb";
 
 export const create = [
   body("name").notEmpty().toLowerCase(),
-  body("parent")
-    .optional()
-    .isString()
-    .notEmpty()
-    .customSanitizer((value) => new ObjectId(value)),
+  body("parent").custom((value, { req }) => {
+    if (value) {
+      req.body.parent = new ObjectId(value);
+    } else {
+      delete req.body.parent;
+    }
+    return true;
+  }),
 ];
 
 export const createDoctor = [
