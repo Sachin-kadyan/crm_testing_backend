@@ -15,13 +15,14 @@ import {
   findDeptTag,
 } from "./crud";
 
-const checkParentExists = async (parent: string) => {
+const checkParentExists = async (parent: ObjectId) => {
   const department = await findOneDepartment({ _id: parent });
   if (!department) throw new ErrorHandler("Invalid Parent", 400);
 };
 
 export const createDepartmentHandler = async (department: iDepartment): Promise<FUNCTION_RESPONSE> => {
   if (department.parent) {
+    department.parent = new ObjectId(department.parent);
     await checkParentExists(department.parent);
   }
   if (!department.parent) {

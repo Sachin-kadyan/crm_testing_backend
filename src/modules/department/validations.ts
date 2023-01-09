@@ -4,11 +4,7 @@ import { ObjectId } from "mongodb";
 export const create = [
   body("name").notEmpty().toLowerCase(),
   body("parent").custom((value, { req }) => {
-    if (value) {
-      req.body.parent = new ObjectId(value);
-    } else {
-      delete req.body.parent;
-    }
+    if (!value) delete req.body.parent;
     return true;
   }),
 ];
