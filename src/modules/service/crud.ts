@@ -12,13 +12,9 @@ export const createSearchIndex = async () => {
   });
 };
 
-// createSearchIndex();
-
 export const createUniqueServiceIndex = async () => {
   await MongoService.collection(SERVICE_DB).createIndex({ serviceId: 1 }, { unique: true });
 };
-
-// createUniqueServiceIndex();
 
 export const createManyServices = async (services: iService[]) => {
   await MongoService.collection(SERVICE_DB).insertMany(services);

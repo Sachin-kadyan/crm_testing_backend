@@ -7,7 +7,7 @@ import cors from "cors";
 import moduleRoutes from "./modules/routes";
 import ErrorHandler from "./utils/errorHandler";
 import MongoService from "./utils/mongo";
-import { startTemplateFlow } from "./modules/flow/functions";
+import seed from "./seed/seed";
 
 declare global {
   namespace Express {
@@ -38,7 +38,7 @@ app.use((err: ErrorHandler, req: Request, res: Response, next: NextFunction) => 
 
 MongoService.init().then(() => {
   app.listen(PORT, async () => {
-    // await startTemplateFlow("apr", "en", "916395186367");
+    await seed();
     console.log(`Server running at ${PORT}`);
   });
 });
