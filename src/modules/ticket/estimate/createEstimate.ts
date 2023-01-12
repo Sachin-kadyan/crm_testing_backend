@@ -13,14 +13,12 @@ import { iEstimate, iTicket } from "../../../types/ticket/ticket";
 const BUCKET_NAME = process.env.PUBLIC_BUCKET_NAME;
 
 const generateEstimate = async (estimateId: ObjectId) => {
-  console.log(estimateId);
   let estimate: iEstimate,
     ticket: iTicket,
     servicesArray: any[] = [],
     investigationArray: any[] = [],
     procedureArray: any[] = [];
   findEstimateById(estimateId).then((res) => {
-    console.log(res);
     if (res === null) throw new ErrorHandler("Invalid estimate", 400);
     estimate = res;
     estimate.service.forEach((item) => {
@@ -58,25 +56,26 @@ const generateEstimate = async (estimateId: ObjectId) => {
           };
 
           wards
-            .filter((item) => item.type === 0)
+            .filter((ward) => ward.type === 0)
             .forEach((item, index) => {
-              charges.room.push(
-                estimate.type === 1
-                  ? item.roomRent * estimate.wardDays +
-                      wards.find((item) => item!._id === estimate.icuType)!.roomRent * estimate.icuDays
-                  : 0
+              const icu = wards.find(
+                (ward) => ward.type === 1 && ward._id?.toString() === estimate.icuType.toString()
               );
+              let roomCharge = 0;
+              roomCharge += icu && estimate.type === 1 ? icu.roomRent * estimate.icuDays : 0; // adding icu charge
+              roomCharge += estimate.type === 1 ? item.roomRent * estimate.wardDays : 0; // adding ward charge
+              charges.room.push(roomCharge);
               let servicePrice = 0;
               services.forEach((service: Record<string, any>) => {
                 let charge: number = service[item.code];
                 servicePrice += charge;
               });
-              let investigationPrice = 0;
+              let investigationPrice = estimate.investigationAmount || 0;
               investigations.forEach((investigation: Record<string, any>) => {
                 let charge: number = investigation[item.code];
                 investigationPrice += charge;
               });
-              let procedurePrice = 0;
+              let procedurePrice = estimate.procedureAmount || 0;
               procedures.forEach((procedure: Record<string, any>) => {
                 let charge: number = procedure[item.code];
                 procedurePrice += charge;
@@ -270,7 +269,7 @@ const generateEstimate = async (estimateId: ObjectId) => {
               `patients/${consumer!._id}/${estimate.ticket}/estimates`,
               BUCKET_NAME
             );
-            await sendMessage(`91${consumer!.phone}`, whatsappEstimatePayload(Location));
+            await sendMessage(consumer!.phone, whatsappEstimatePayload(Location));
           });
         });
       });
