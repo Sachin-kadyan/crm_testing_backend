@@ -22,6 +22,8 @@ const findNodeById = async (nodeId: ObjectId) => {
 };
 
 export const findAndSendNode = async (nodeIdentifier: string, receiver: string) => {
+  const { ticket } = await findConsumerFromWAID(receiver);
+  if (!ticket) throw new ErrorHandler("Ticket Not Found", 404);
   const node = await findNodeWithId(nodeIdentifier);
   if (node === null) throw new Error("Node not found");
   if (node.type === "reply") {
@@ -31,7 +33,6 @@ export const findAndSendNode = async (nodeIdentifier: string, receiver: string) 
     const listPayload = createListPayload(node);
     await sendMessage(receiver, listPayload);
   }
-  const { ticket } = await findConsumerFromWAID(receiver);
   await saveFlowMessages(ticket, node._id!);
 };
 

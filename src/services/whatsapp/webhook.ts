@@ -3,6 +3,7 @@ import { CONSUMER } from "../../types/consumer/consumer";
 import { iTextMessage, iWebhookPayload } from "../../types/flow/webhook";
 import { iStage } from "../../types/stages/stages";
 import { iTicket } from "../../types/ticket/ticket";
+import ErrorHandler from "../../utils/errorHandler";
 import MongoService, { Collections } from "../../utils/mongo";
 
 export const saveMessageFromWebhook = (payload: iWebhookPayload) => {
@@ -12,6 +13,7 @@ export const saveMessageFromWebhook = (payload: iWebhookPayload) => {
         // finding consumer and ticket
         (async function () {
           const { consumer, ticket } = await findConsumerFromWAID(changes.value.contacts[mi].wa_id);
+          if (!consumer) throw new ErrorHandler("Consumer Not Found", 500);
           if (message.text) {
             const saveMessage: iTextMessage = {
               consumer: consumer,

@@ -6,7 +6,6 @@ import {
   saveMessageFromWebhook,
   saveTextMessage,
 } from "../../services/whatsapp/webhook";
-import { sendMessage } from "../../services/whatsapp/whatsapp";
 import { iWebhookPayload } from "../../types/flow/webhook";
 import ErrorHandler from "../../utils/errorHandler";
 import { findConsumerById } from "../consumer/functions";
@@ -19,7 +18,6 @@ import {
   findFlowConnectorByTemplateIdentifier,
   sendTextMessage,
 } from "./functions";
-import { createTextPayload } from "./utils";
 
 export const createReplyNodeController = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
@@ -49,29 +47,34 @@ export const ConnectFlow = PromiseWrapper(
 // webhook
 export const HandleWebhook = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
-    const body: iWebhookPayload = req.body;
-    saveMessageFromWebhook(body); // saving message
+    try {
+      const body: iWebhookPayload = req.body;
+      saveMessageFromWebhook(body); // saving message
 
-    //handling the responses
-    body.entry.forEach((entry) => {
-      entry.changes.forEach((changes) => {
-        changes.value.messages.forEach(async (message, mi) => {
-          if (message.button) {
-            const connector = await findFlowConnectorByTemplateIdentifier(message.button.text);
-            if (connector) {
-              await findAndSendNode(connector.nodeIdentifier, changes.value.contacts[mi].wa_id);
+      //handling the responses
+      body.entry.forEach((entry) => {
+        entry.changes.forEach((changes) => {
+          changes.value.messages.forEach(async (message, mi) => {
+            if (message.button) {
+              const connector = await findFlowConnectorByTemplateIdentifier(message.button.text);
+              if (connector) {
+                await findAndSendNode(connector.nodeIdentifier, changes.value.contacts[mi].wa_id);
+              }
+            } else if (message.interactive) {
+              const nodeIdentifier =
+                message.interactive.type === "button_reply"
+                  ? message.interactive.button_reply.id
+                  : message.interactive.list_reply.id;
+              await findAndSendNode(nodeIdentifier, changes.value.contacts[mi].wa_id);
             }
-          } else if (message.interactive) {
-            const nodeIdentifier =
-              message.interactive.type === "button_reply"
-                ? message.interactive.button_reply.id
-                : message.interactive.list_reply.id;
-            await findAndSendNode(nodeIdentifier, changes.value.contacts[mi].wa_id);
-          }
+          });
         });
       });
-    });
-    res.sendStatus(200);
+      res.sendStatus(200);
+    } catch (error) {
+      console.log(error);
+      res.sendStatus(200);
+    }
   }
 );
 
