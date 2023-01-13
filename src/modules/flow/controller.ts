@@ -45,36 +45,39 @@ export const ConnectFlow = PromiseWrapper(
 );
 
 // webhook
-export const HandleWebhook = (req: Request, res: Response, next: NextFunction) => {
+export const HandleWebhook = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const body: iWebhookPayload = req.body;
     //handling the responses
     body.entry.forEach((entry) => {
       entry.changes.forEach((changes) => {
-        changes.value.messages.forEach(async (message, mi) => {
-          const { consumer, ticket } = await findConsumerFromWAID(changes.value.contacts[mi].wa_id);
-          if (!consumer && !ticket) throw new ErrorHandler("Consumer Not Found", 404);
-          if (message.button) {
-            const connector = await findFlowConnectorByTemplateIdentifier(message.button.text);
-            if (connector) {
-              await findAndSendNode(connector.nodeIdentifier, changes.value.contacts[mi].wa_id, ticket);
-              await saveMessageFromWebhook(body, consumer, ticket); // saving message
+        changes.value.messages.forEach((message, mi) => {
+          (async function () {
+            try {
+              const { consumer, ticket } = await findConsumerFromWAID(changes.value.contacts[mi].wa_id);
+              if (message.button) {
+                const connector = await findFlowConnectorByTemplateIdentifier(message.button.text);
+                if (connector) {
+                  await findAndSendNode(connector.nodeIdentifier, changes.value.contacts[mi].wa_id, ticket);
+                  await saveMessageFromWebhook(body, consumer, ticket); // saving message
+                }
+              } else if (message.interactive) {
+                const nodeIdentifier =
+                  message.interactive.type === "button_reply"
+                    ? message.interactive.button_reply.id
+                    : message.interactive.list_reply.id;
+                await findAndSendNode(nodeIdentifier, changes.value.contacts[mi].wa_id, ticket);
+                await saveMessageFromWebhook(body, consumer, ticket); // saving message
+              }
+            } catch (error: any) {
+              console.log(error.message);
             }
-          } else if (message.interactive) {
-            const nodeIdentifier =
-              message.interactive.type === "button_reply"
-                ? message.interactive.button_reply.id
-                : message.interactive.list_reply.id;
-            console.log(message.interactive);
-            await findAndSendNode(nodeIdentifier, changes.value.contacts[mi].wa_id, ticket);
-            await saveMessageFromWebhook(body, consumer, ticket); // saving message
-          }
+          })();
         });
       });
     });
     return res.sendStatus(200);
   } catch (error: any) {
-    console.log(error.response.data);
     return res.sendStatus(200);
   }
 };

@@ -80,11 +80,10 @@ export const saveFlowMessages = async (ticket: ObjectId, node: ObjectId) => {
 
 export const findConsumerFromWAID = async (consumerWAId: string) => {
   const stages = await MongoService.collection(Collections.STAGE).find<iStage>({}).toArray();
-  console.log(consumerWAId);
   const consumer = await MongoService.collection(Collections.CONSUMER).findOne<CONSUMER>({
     phone: consumerWAId,
   });
-  if (consumer === null) throw new Error("No Consumer Found");
+  if (consumer === null) throw new ErrorHandler("No Consumer Found", 404);
   const tickets = await MongoService.collection(Collections.TICKET)
     .find<iTicket>({
       consumer: consumer._id,
@@ -93,6 +92,6 @@ export const findConsumerFromWAID = async (consumerWAId: string) => {
   const ticket = tickets.find(
     (item) => stages.find((stage) => stage._id?.toString() === item.stage.toString())!.code < 8
   );
-  if (!ticket) throw new Error("No Ticket Found");
+  if (!ticket) throw new ErrorHandler("No Ticket Found", 404);
   return { ticket: ticket._id!, consumer: consumer._id };
 };
