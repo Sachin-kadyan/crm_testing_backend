@@ -45,46 +45,43 @@ export const ConnectFlow = PromiseWrapper(
 );
 
 // webhook
-export const HandleWebhook = PromiseWrapper(
-  async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
-    try {
-      const body: iWebhookPayload = req.body;
-      //handling the responses
-      body.entry.forEach((entry) => {
-        entry.changes.forEach((changes) => {
-          changes.value.messages.forEach(async (message, mi) => {
-            const { consumer } = await findConsumerFromWAID(changes.value.contacts[mi].wa_id);
-            if (!consumer) throw new ErrorHandler("Consumer Not Found", 404);
-            if (message.button) {
-              const connector = await findFlowConnectorByTemplateIdentifier(message.button.text);
-              if (connector) {
-                await findAndSendNode(connector.nodeIdentifier, changes.value.contacts[mi].wa_id);
-                saveMessageFromWebhook(body); // saving message
-              }
-            } else if (message.interactive) {
-              const nodeIdentifier =
-                message.interactive.type === "button_reply"
-                  ? message.interactive.button_reply.id
-                  : message.interactive.list_reply.id;
-              console.log(message.interactive);
-              await findAndSendNode(nodeIdentifier, changes.value.contacts[mi].wa_id);
-              saveMessageFromWebhook(body); // saving message
+export const HandleWebhook = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const body: iWebhookPayload = req.body;
+    //handling the responses
+    body.entry.forEach((entry) => {
+      entry.changes.forEach((changes) => {
+        changes.value.messages.forEach(async (message, mi) => {
+          const { consumer, ticket } = await findConsumerFromWAID(changes.value.contacts[mi].wa_id);
+          if (!consumer && !ticket) throw new ErrorHandler("Consumer Not Found", 404);
+          if (message.button) {
+            const connector = await findFlowConnectorByTemplateIdentifier(message.button.text);
+            if (connector) {
+              await findAndSendNode(connector.nodeIdentifier, changes.value.contacts[mi].wa_id, ticket);
+              saveMessageFromWebhook(body, consumer, ticket); // saving message
             }
-          });
+          } else if (message.interactive) {
+            const nodeIdentifier =
+              message.interactive.type === "button_reply"
+                ? message.interactive.button_reply.id
+                : message.interactive.list_reply.id;
+            console.log(message.interactive);
+            await findAndSendNode(nodeIdentifier, changes.value.contacts[mi].wa_id, ticket);
+            saveMessageFromWebhook(body, consumer, ticket); // saving message
+          }
         });
       });
-      res.sendStatus(200);
-    } catch (error: any) {
-      console.log(error.response.data);
-      res.sendStatus(200);
-    }
+    });
+    return res.sendStatus(200);
+  } catch (error: any) {
+    console.log(error.response.data);
+    return res.sendStatus(200);
   }
-);
+};
 
 export const SendMessage = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
     const { message, consumerId } = req.body;
-    console.log(consumerId);
     const consumer = await findConsumerById(consumerId);
     if (consumer === null) throw new ErrorHandler("Consumer Not Found", 400);
     const sender = req.user!.firstName + " " + req.user!.lastName;

@@ -21,9 +21,7 @@ const findNodeById = async (nodeId: ObjectId) => {
   return await MongoService.collection(Collections.FLOW).findOne<iReplyNode | iListNode>({ _id: nodeId });
 };
 
-export const findAndSendNode = async (nodeIdentifier: string, receiver: string) => {
-  const { ticket } = await findConsumerFromWAID(receiver);
-  if (!ticket) throw new ErrorHandler("Ticket Not Found", 404);
+export const findAndSendNode = async (nodeIdentifier: string, receiver: string, ticket: ObjectId) => {
   const node = await findNodeWithId(nodeIdentifier);
   if (node === null) throw new Error("Node not found");
   if (node.type === "reply") {
