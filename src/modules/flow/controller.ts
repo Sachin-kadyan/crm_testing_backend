@@ -58,7 +58,7 @@ export const HandleWebhook = (req: Request, res: Response, next: NextFunction) =
             const connector = await findFlowConnectorByTemplateIdentifier(message.button.text);
             if (connector) {
               await findAndSendNode(connector.nodeIdentifier, changes.value.contacts[mi].wa_id, ticket);
-              saveMessageFromWebhook(body, consumer, ticket); // saving message
+              await saveMessageFromWebhook(body, consumer, ticket); // saving message
             }
           } else if (message.interactive) {
             const nodeIdentifier =
@@ -67,7 +67,7 @@ export const HandleWebhook = (req: Request, res: Response, next: NextFunction) =
                 : message.interactive.list_reply.id;
             console.log(message.interactive);
             await findAndSendNode(nodeIdentifier, changes.value.contacts[mi].wa_id, ticket);
-            saveMessageFromWebhook(body, consumer, ticket); // saving message
+            await saveMessageFromWebhook(body, consumer, ticket); // saving message
           }
         });
       });
