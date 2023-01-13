@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { ClientSession, Collection, ObjectId } from "mongodb";
 import PromiseWrapper from "../../middleware/promiseWrapper";
-import { putMedia } from "../../services/aws/s3";
+import { getMedia, putMedia } from "../../services/aws/s3";
 import { iEstimate, iPrescription, iTicket } from "../../types/ticket/ticket";
 import ErrorHandler from "../../utils/errorHandler";
 import MongoService, { Collections } from "../../utils/mongo";
@@ -144,7 +144,9 @@ export const getRepresentativeTickets = PromiseWrapper(
         },
       ])
       .toArray();
-
+    tickets.forEach((ticket) => {
+      ticket.prescription[0].image = getMedia(ticket.prescription[0].image);
+    });
     return res.status(200).json(tickets);
   }
 );
