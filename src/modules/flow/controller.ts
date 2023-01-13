@@ -49,30 +49,33 @@ export const HandleWebhook = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
     try {
       const body: iWebhookPayload = req.body;
-      saveMessageFromWebhook(body); // saving message
-
       //handling the responses
       body.entry.forEach((entry) => {
         entry.changes.forEach((changes) => {
           changes.value.messages.forEach(async (message, mi) => {
+            const { consumer } = await findConsumerFromWAID(changes.value.contacts[mi].wa_id);
+            if (!consumer) throw new ErrorHandler("Consumer Not Found", 404);
             if (message.button) {
               const connector = await findFlowConnectorByTemplateIdentifier(message.button.text);
               if (connector) {
                 await findAndSendNode(connector.nodeIdentifier, changes.value.contacts[mi].wa_id);
+                saveMessageFromWebhook(body); // saving message
               }
             } else if (message.interactive) {
               const nodeIdentifier =
                 message.interactive.type === "button_reply"
                   ? message.interactive.button_reply.id
                   : message.interactive.list_reply.id;
+              console.log(message.interactive);
               await findAndSendNode(nodeIdentifier, changes.value.contacts[mi].wa_id);
+              saveMessageFromWebhook(body); // saving message
             }
           });
         });
       });
       res.sendStatus(200);
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      console.log(error.response.data);
       res.sendStatus(200);
     }
   }
