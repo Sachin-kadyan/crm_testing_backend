@@ -128,7 +128,7 @@ export const getRepresentativeTickets = PromiseWrapper(
             localField: "consumer",
             foreignField: "_id",
             let: { consumer: "$consumer" },
-            pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$consumer"] } } }],
+            pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$consumer"] } } }, { $limit: 1 }],
             as: "consumer",
           },
         },
@@ -137,9 +137,21 @@ export const getRepresentativeTickets = PromiseWrapper(
             from: Collections.PRESCRIPTION,
             localField: "prescription",
             let: { prescription: "$prescription" },
-            pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$prescription"] } } }],
+            pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$prescription"] } } }, { $limit: 1 }],
             foreignField: "_id",
             as: "prescription",
+          },
+        },
+        {
+          $lookup: {
+            from: Collections.ESTIMATE,
+            let: { id: "$_id" },
+            pipeline: [
+              { $match: { $expr: { $eq: ["$$id", "$ticket"] } } },
+              { $sort: { _id: -1 } },
+              { $limit: 1 },
+            ],
+            as: "estimate",
           },
         },
       ])
