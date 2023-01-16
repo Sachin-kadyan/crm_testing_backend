@@ -47,6 +47,14 @@ export const getServiceById = async (id: ObjectId) => {
   return await MongoService.collection(Collections.SERVICE).findOne<iService>({ _id: id });
 };
 
-export const getAllServices = async () => {
-  return await MongoService.collection(Collections.SERVICE).find<iService>({}).toArray();
+export const getTotalServiceCount = async () => {
+  return await MongoService.collection(Collections.SERVICE).countDocuments();
+};
+
+export const getServices = async (page: number, pageLength: number) => {
+  return await MongoService.collection(Collections.SERVICE)
+    .find<iService>({})
+    .limit(pageLength > 50 ? 50 : pageLength)
+    .skip(page * pageLength)
+    .toArray();
 };

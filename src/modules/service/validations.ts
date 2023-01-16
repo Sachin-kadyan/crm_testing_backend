@@ -1,4 +1,4 @@
-import { body } from "express-validator";
+import { body, param, query } from "express-validator";
 import { ObjectId } from "mongodb";
 
 export const create = [
@@ -23,4 +23,9 @@ export const create = [
   body("*.singleRoomCharge").notEmpty().toInt().isNumeric(),
   body("*.deluxeRoomCharge").notEmpty().toInt().isNumeric(),
   body("*.vipRoomCharge").notEmpty().toInt().isNumeric(),
+];
+
+export const get_services = [
+  query("pageLength").notEmpty().bail().isInt().bail().toInt(),
+  query("page").notEmpty().bail().isInt().bail().toInt(),
 ];
