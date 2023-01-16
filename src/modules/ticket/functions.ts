@@ -49,12 +49,23 @@ export const createEstimate = async (estimate: iEstimate, session: ClientSession
   return estimate;
 };
 
-export const findEstimateById = async (estimateId: ObjectId) => {
-  return await MongoService.collection(Collections.ESTIMATE).findOne<iEstimate>({ _id: estimateId });
+export const findEstimateById = async (estimateId: ObjectId, session?: ClientSession) => {
+  return await MongoService.collection(Collections.ESTIMATE).findOne<iEstimate>(
+    { _id: estimateId },
+    { session }
+  );
 };
 
 export const getTicketEstimates = async (ticketId: ObjectId) => {
   return await MongoService.collection(Collections.ESTIMATE).find<iEstimate>({ ticket: ticketId }).toArray();
+};
+
+export const updateEstimateTotal = async (estimateId: ObjectId, total: number, session?: ClientSession) => {
+  return await MongoService.collection(Collections.ESTIMATE).findOneAndUpdate(
+    { _id: estimateId },
+    { $set: { total } },
+    { session }
+  );
 };
 
 // notes

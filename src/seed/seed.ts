@@ -6,6 +6,6 @@ import firestore from "../services/firebase/firebase";
 export default async function () {
   false && (await createSearchIndex());
   false && (await createUniqueServiceIndex());
-  false && (await generateEstimate(new ObjectId("63bfaf8f7b190547681994fa")));
+  // false && (await generateEstimate(new ObjectId("63bfaf8f7b190547681994fa")));
   // firestore.collection("user").doc("akhil").set({ name: "akhil" });
 }

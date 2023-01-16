@@ -1,24 +1,23 @@
-import { ObjectId } from "mongodb";
+import { ClientSession, ObjectId } from "mongodb";
 import PDFDocument from "pdfkit";
 import ErrorHandler from "../../../utils/errorHandler";
 import { findConsumerById } from "../../consumer/functions";
-import { findDoctorById, getAllWards } from "../../department/functions";
+import { getAllWards } from "../../department/functions";
 import { findPrescriptionById, findServices, findTicketById } from "../crud";
-import { findEstimateById } from "../functions";
-import blobStream from "blob-stream";
+import { findEstimateById, updateEstimateTotal } from "../functions";
 import { putMedia } from "../../../services/aws/s3";
 import { sendMessage } from "../../../services/whatsapp/whatsapp";
 import { whatsappEstimatePayload } from "./utils";
 import { iEstimate, iTicket } from "../../../types/ticket/ticket";
 const BUCKET_NAME = process.env.PUBLIC_BUCKET_NAME;
 
-const generateEstimate = async (estimateId: ObjectId) => {
+const generateEstimate = async (estimateId: ObjectId, session: ClientSession) => {
   let estimate: iEstimate,
     ticket: iTicket,
     servicesArray: any[] = [],
     investigationArray: any[] = [],
     procedureArray: any[] = [];
-  findEstimateById(estimateId).then((res) => {
+  findEstimateById(estimateId, session).then((res) => {
     if (res === null) throw new ErrorHandler("Invalid estimate", 400);
     estimate = res;
     estimate.service.forEach((item) => {
@@ -97,9 +96,7 @@ const generateEstimate = async (estimateId: ObjectId) => {
                   (estimate.additionalAmount ? estimate.additionalAmount : 0)
               );
             });
-          console.log(charges);
           const document = new PDFDocument();
-          const stream = document.pipe(blobStream());
           let buffers: any = [];
           document.on("data", buffers.push.bind(buffers));
           //   hospital information
@@ -270,6 +267,7 @@ const generateEstimate = async (estimateId: ObjectId) => {
               BUCKET_NAME
             );
             await sendMessage(consumer!.phone, whatsappEstimatePayload(Location));
+            await updateEstimateTotal(estimateId, charges.total[0], session);
           });
         });
       });
