@@ -63,7 +63,7 @@ interface iTextMessage {
   text: string;
   sender: string;
   type: "received" | "sent";
-  ticket: ObjectId;
-  consumer: ObjectId;
+  ticket: string;
+  consumer: string;
   messageType: "text";
 }

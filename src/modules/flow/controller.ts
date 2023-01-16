@@ -3,6 +3,7 @@ import { ClientSession } from "mongodb";
 import PromiseWrapper from "../../middleware/promiseWrapper";
 import {
   findConsumerFromWAID,
+  saveMessage,
   saveMessageFromWebhook,
   saveTextMessage,
 } from "../../services/whatsapp/webhook";
@@ -59,7 +60,7 @@ export const HandleWebhook = async (req: Request, res: Response, next: NextFunct
                 const connector = await findFlowConnectorByTemplateIdentifier(message.button.text);
                 if (connector) {
                   await findAndSendNode(connector.nodeIdentifier, changes.value.contacts[mi].wa_id, ticket);
-                  await saveMessageFromWebhook(body, consumer, ticket); // saving message
+                  await saveMessageFromWebhook(body, consumer.toString(), ticket.toString()); // saving message
                 }
               } else if (message.interactive) {
                 const nodeIdentifier =
@@ -67,7 +68,7 @@ export const HandleWebhook = async (req: Request, res: Response, next: NextFunct
                     ? message.interactive.button_reply.id
                     : message.interactive.list_reply.id;
                 await findAndSendNode(nodeIdentifier, changes.value.contacts[mi].wa_id, ticket);
-                await saveMessageFromWebhook(body, consumer, ticket); // saving message
+                await saveMessageFromWebhook(body, consumer.toString(), ticket.toString()); // saving message
               }
             } catch (error: any) {
               console.log(error.message);
@@ -90,17 +91,15 @@ export const SendMessage = PromiseWrapper(
     const sender = req.user!.firstName + " " + req.user!.lastName;
     await sendTextMessage(message, consumer.phone, sender);
     const { ticket } = await findConsumerFromWAID(consumer.phone);
-    saveTextMessage(
-      {
-        consumer: consumer._id,
-        messageType: "text",
-        sender: req.user!._id,
-        text: message,
-        ticket,
-        type: "sent",
-      },
-      session
-    );
+    saveMessage(ticket.toString(), {
+      consumer: consumer._id.toString(),
+      messageType: "text",
+      sender: req.user!._id,
+      text: message,
+      ticket: ticket.toString(),
+      type: "sent",
+    });
+
     return res.status(200).json({ message: "message sent." });
   }
 );

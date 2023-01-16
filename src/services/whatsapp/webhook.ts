@@ -5,19 +5,16 @@ import { iStage } from "../../types/stages/stages";
 import { iTicket } from "../../types/ticket/ticket";
 import ErrorHandler from "../../utils/errorHandler";
 import MongoService, { Collections } from "../../utils/mongo";
+import firestore, { fsCollections } from "../firebase/firebase";
 
-export const saveMessageFromWebhook = async (
-  payload: iWebhookPayload,
-  consumer: ObjectId,
-  ticket: ObjectId
-) => {
+export const saveMessageFromWebhook = async (payload: iWebhookPayload, consumer: string, ticket: string) => {
   payload.entry.map((entry) => {
     entry.changes.map((changes) => {
       changes.value.messages.map((message, mi) => {
         // finding consumer and ticket
         (async function () {
           if (message.text) {
-            const saveMessage: iTextMessage = {
+            const messagePayload: iTextMessage = {
               consumer: consumer,
               sender: changes.value.contacts[mi].wa_id,
               text: message.text.body,
@@ -25,20 +22,20 @@ export const saveMessageFromWebhook = async (
               type: "received",
               messageType: "text",
             };
-            await MongoService.collection(Collections.MESSAGES).insertOne(saveMessage);
+            await saveMessage(ticket, messagePayload);
           } else if (message.button) {
-            const saveMessage: iTextMessage = {
-              consumer: consumer,
+            const messagePayload: iTextMessage = {
+              consumer: consumer.toString(),
               sender: changes.value.contacts[mi].wa_id,
               text: message.button.text,
-              ticket: ticket,
+              ticket: ticket.toString(),
               type: "received",
               messageType: "text",
             };
-            await MongoService.collection(Collections.MESSAGES).insertOne(saveMessage);
+            await saveMessage(ticket.toString(), messagePayload);
           } else if (message.interactive) {
             if (message.interactive.type === "button_reply") {
-              const saveMessage: iTextMessage = {
+              const messagePayload: iTextMessage = {
                 consumer: consumer,
                 sender: changes.value.contacts[mi].wa_id,
                 text: message.interactive.button_reply.title,
@@ -46,9 +43,9 @@ export const saveMessageFromWebhook = async (
                 type: "received",
                 messageType: "text",
               };
-              await MongoService.collection(Collections.MESSAGES).insertOne(saveMessage);
+              await saveMessage(ticket, messagePayload);
             } else {
-              const saveMessage: iTextMessage = {
+              const messagePayload: iTextMessage = {
                 consumer: consumer,
                 sender: changes.value.contacts[mi].wa_id,
                 text:
@@ -57,13 +54,22 @@ export const saveMessageFromWebhook = async (
                 type: "received",
                 messageType: "text",
               };
-              await MongoService.collection(Collections.MESSAGES).insertOne(saveMessage);
+              await saveMessage(ticket, messagePayload);
             }
           }
         })();
       });
     });
   });
+};
+
+export const saveMessage = async (ticket: string, message: any) => {
+  return await firestore
+    .collection(fsCollections.TICKET)
+    .doc(ticket)
+    .collection(fsCollections.MESSAGES)
+    .doc()
+    .set(message);
 };
 
 export const saveTextMessage = async (message: iTextMessage, session: ClientSession) => {
