@@ -1,4 +1,4 @@
-import { Db, MongoClient } from "mongodb";
+import { Db, MongoClient, ObjectId } from "mongodb";
 
 export const Collections = {
   PRESCRIPTION: "prescription",
@@ -37,5 +37,9 @@ abstract class MongoService {
     return MongoService._client.startSession();
   }
 }
+
+export const getCreateDate = (id: ObjectId) => {
+  return id.getTimestamp();
+};
 
 export default MongoService;
