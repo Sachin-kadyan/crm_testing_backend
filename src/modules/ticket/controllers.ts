@@ -4,7 +4,7 @@ import PromiseWrapper from "../../middleware/promiseWrapper";
 import { getMedia, putMedia } from "../../services/aws/s3";
 import { iEstimate, iPrescription, iTicket } from "../../types/ticket/ticket";
 import ErrorHandler from "../../utils/errorHandler";
-import MongoService, { Collections } from "../../utils/mongo";
+import MongoService, { Collections, getCreateDate } from "../../utils/mongo";
 import { findConsumer } from "../consumer/crud";
 import { findConsumerById } from "../consumer/functions";
 import { findDoctorById, getDepartmentById, getWardById } from "../department/functions";
@@ -158,6 +158,9 @@ export const getRepresentativeTickets = PromiseWrapper(
       .toArray();
     tickets.forEach((ticket) => {
       ticket.prescription[0].image = getMedia(ticket.prescription[0].image);
+      ticket.createdAt = getCreateDate(ticket._id);
+      ticket.prescription[0].createdAt = getCreateDate(ticket.prescription[0]._id);
+      ticket.estimate[0].createdAt = getCreateDate(ticket.estimate[0]._id);
     });
     return res.status(200).json(tickets);
   }
