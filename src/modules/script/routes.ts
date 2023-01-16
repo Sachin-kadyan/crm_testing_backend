@@ -7,7 +7,10 @@ import * as validations from "./validations";
 const router: Router = Router();
 
 router.use(isLoggedIn);
-router.route("/").post(isAdmin, validations.create_script, controllers.CreateScript);
+router
+  .route("/")
+  .post(isAdmin, validations.create_script, controllers.CreateScript)
+  .get(validations.get_scripts, controllers.GetScripts);
 router.route("/:serviceId/:stageId").get(validations.get_script, controllers.GetScript);
 
 export default router;

@@ -1,4 +1,4 @@
-import { body, param } from "express-validator";
+import { body, param, query } from "express-validator";
 import { ObjectId } from "mongodb";
 
 export const create_script = [
@@ -22,4 +22,9 @@ export const get_script = [
     .notEmpty()
     .isString()
     .customSanitizer((value) => new ObjectId(value)),
+];
+
+export const get_scripts = [
+  query("pageLength").notEmpty().bail().isInt().bail().toInt(),
+  query("page").notEmpty().bail().isInt().bail().toInt(),
 ];
