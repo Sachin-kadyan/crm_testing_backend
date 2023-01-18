@@ -10,6 +10,7 @@ import { findConsumerById } from "../consumer/functions";
 import { findDoctorById, getDepartmentById, getWardById } from "../department/functions";
 import { findFlowConnectorByService, startTemplateFlow } from "../flow/functions";
 import { getSortedLeadCountRepresentatives } from "../representative/functions";
+import { findOneService } from "../service/crud";
 import { getServiceById } from "../service/functions";
 import { findStageByCode } from "../stages/functions";
 import { createOnePrescription, findPrescription, findPrescriptionById, findTicket } from "./crud";
@@ -119,7 +120,6 @@ export const ticketsWithPrescription = PromiseWrapper(
 
 export const getRepresentativeTickets = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
-    // const tickets = await findTicket({ creator: new ObjectId(req.user!._id) });
     const tickets = await MongoService.collection(Collections.TICKET)
       .aggregate([
         {
@@ -156,14 +156,16 @@ export const getRepresentativeTickets = PromiseWrapper(
         },
       ])
       .toArray();
-    tickets.forEach((ticket) => {
+    for await (const ticket of tickets) {
       ticket.prescription[0].image = getMedia(ticket.prescription[0].image);
       ticket.createdAt = getCreateDate(ticket._id);
       ticket.prescription[0].createdAt = getCreateDate(ticket.prescription[0]._id);
       if (ticket.estimate[0]) {
+        const service = await findOneService({ _id: ticket.estimate[0].service[0].id });
+        ticket.estimate[0].service[0] = { ...ticket.estimate[0].service[0], ...service };
         ticket.estimate[0].createdAt = getCreateDate(ticket.estimate[0]._id);
       }
-    });
+    }
     return res.status(200).json(tickets);
   }
 );
