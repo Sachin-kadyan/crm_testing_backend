@@ -160,7 +160,9 @@ export const getRepresentativeTickets = PromiseWrapper(
       ticket.prescription[0].image = getMedia(ticket.prescription[0].image);
       ticket.createdAt = getCreateDate(ticket._id);
       ticket.prescription[0].createdAt = getCreateDate(ticket.prescription[0]._id);
-      ticket.estimate[0].createdAt = getCreateDate(ticket.estimate[0]._id);
+      if (ticket.estimate[0]) {
+        ticket.estimate[0].createdAt = getCreateDate(ticket.estimate[0]._id);
+      }
     });
     return res.status(200).json(tickets);
   }
