@@ -59,3 +59,17 @@ export const sendTextMessage = async (message: string, receiver: string, sender:
   const textPayload = createTextPayload(message, sender);
   await sendMessage(receiver, textPayload);
 };
+
+export const createNodeIndexes = async () => {
+  await MongoService.collection(Collections.FLOW).createIndex({
+    nodeId: "text",
+    diseaseId: "text",
+    templateName: "text",
+  });
+};
+
+export const findNodeByDiseaseId = async (flowQuery: string) => {
+  return await MongoService.collection(Collections.FLOW)
+    .find<iReplyNode | iListNode>({ $text: { $search: flowQuery } })
+    .toArray();
+};

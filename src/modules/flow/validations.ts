@@ -1,6 +1,6 @@
 import { ObjectID } from "bson";
 import { NextFunction, Request, Response } from "express";
-import { body } from "express-validator";
+import { body, query } from "express-validator";
 
 export const createReply = (req: Request, res: Response, next: NextFunction) => {
   const nodes: {
@@ -267,3 +267,5 @@ export const send_message = [
     .notEmpty()
     .customSanitizer((value) => new ObjectID(value)),
 ];
+
+export const searchFlowNode = [query("flowQuery").notEmpty().isString()];

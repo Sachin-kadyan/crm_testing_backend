@@ -5,6 +5,7 @@ import isLoggedIn from "../../middleware/authorization/isLoggedIn";
 import isAdmin from "../../middleware/authorization/isAdmin";
 
 const router = Router();
+router.route("/search").get(validations.searchFlowNode, controllers.FindNode);
 router.route("/reply").post(isLoggedIn, validations.createReply, controllers.createReplyNodeController);
 router.route("/list").post(isLoggedIn, validations.createList, controllers.createListNodeController);
 router.route("/connect").post(isLoggedIn, isAdmin, validations.connect_flow, controllers.ConnectFlow);

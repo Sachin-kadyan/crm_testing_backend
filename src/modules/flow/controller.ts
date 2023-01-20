@@ -17,6 +17,7 @@ import {
   createReplyNode,
   findAndSendNode,
   findFlowConnectorByTemplateIdentifier,
+  findNodeByDiseaseId,
   sendTextMessage,
 } from "./functions";
 
@@ -101,5 +102,13 @@ export const SendMessage = PromiseWrapper(
     });
 
     return res.status(200).json({ message: "message sent." });
+  }
+);
+
+export const FindNode = PromiseWrapper(
+  async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
+    const { flowQuery } = req.query as unknown as { flowQuery: string };
+    const node = await findNodeByDiseaseId(flowQuery);
+    return res.status(200).json(node);
   }
 );
