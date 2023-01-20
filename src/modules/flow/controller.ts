@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ClientSession } from "mongodb";
+import { page } from "pdfkit";
 import PromiseWrapper from "../../middleware/promiseWrapper";
 import {
   findConsumerFromWAID,
@@ -18,6 +19,7 @@ import {
   findAndSendNode,
   findFlowConnectorByTemplateIdentifier,
   findNodeByDiseaseId,
+  getConnector,
   sendTextMessage,
 } from "./functions";
 
@@ -110,5 +112,14 @@ export const FindNode = PromiseWrapper(
     const { flowQuery } = req.query as unknown as { flowQuery: string };
     const node = await findNodeByDiseaseId(flowQuery);
     return res.status(200).json(node);
+  }
+);
+
+export const GetConnector = PromiseWrapper(
+  async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
+    const { pageLength, page } = req.query as unknown as { pageLength: number; page: number };
+    if (pageLength > 50) throw new ErrorHandler("Page Length Limit Exceed", 400);
+    const connectors = await getConnector(pageLength, page);
+    return res.status(200).json(connectors);
   }
 );

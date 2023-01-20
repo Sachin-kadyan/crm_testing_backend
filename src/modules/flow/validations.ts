@@ -269,3 +269,8 @@ export const send_message = [
 ];
 
 export const searchFlowNode = [query("flowQuery").notEmpty().isString()];
+
+export const get_flow_connector = [
+  query("pageLength").notEmpty().isInt({ max: 50 }).toInt(),
+  query("page").notEmpty().isInt().toInt(),
+];

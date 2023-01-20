@@ -73,3 +73,13 @@ export const findNodeByDiseaseId = async (flowQuery: string) => {
     .find<iReplyNode | iListNode>({ $text: { $search: flowQuery } })
     .toArray();
 };
+
+// connector
+
+export const getConnector = async (pageLength: number, page: number) => {
+  return await MongoService.collection(Collections.FLOW_CONNECT)
+    .find<iFlowConnect>({})
+    .limit(pageLength)
+    .skip(pageLength * page)
+    .toArray();
+};
