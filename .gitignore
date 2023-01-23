@@ -1,5 +1,5 @@
 node_modules/
-src/.env
+.env
 creds.txt
 dist/
 areteSA.json

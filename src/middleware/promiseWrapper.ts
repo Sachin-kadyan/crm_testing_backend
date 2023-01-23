@@ -11,6 +11,9 @@ const PromiseWrapper =
       validationResult(req).throw();
       await session.withTransaction(async () => func(req, res, next, session));
     } catch (error: any) {
+      if (process.env.ENVIRONMENT === "dev") {
+        console.log(error);
+      }
       if (error.code) {
         next(error);
       } else if (error.errors) {

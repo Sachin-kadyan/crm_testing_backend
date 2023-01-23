@@ -77,6 +77,7 @@ export const createTicket = PromiseWrapper(
     } else {
       const stage = await findStageByCode(0);
       const representatives = await getSortedLeadCountRepresentatives();
+      if (representatives.length === 0) throw new ErrorHandler("Representatives Not Found", 422);
       const { status, body } = await createTicketHandler({
         consumer: ticket.consumer,
         prescription: _id,

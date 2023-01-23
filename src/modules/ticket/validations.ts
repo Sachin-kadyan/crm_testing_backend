@@ -12,8 +12,8 @@ export const create = [
     .notEmpty()
     .customSanitizer((value) => new ObjectId(value))
     .notEmpty(),
-  body("condition").notEmpty().isString().toLowerCase(),
-  body("symptoms").notEmpty().isString(),
+  body("condition").optional({ nullable: true }).notEmpty().bail().isString().toLowerCase(),
+  body("symptoms").optional({ nullable: true }).notEmpty().bail().isString(),
   body("followUp").notEmpty().toDate().notEmpty(),
   body("medicines").optional(),
   body("diagnostics").optional(),
