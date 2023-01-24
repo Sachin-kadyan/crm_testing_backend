@@ -29,9 +29,36 @@ const tagValidation = async (services: iService[]) => {
   if (!check) throw new ErrorHandler("Invalid Tag Passed", 400);
 };
 
-export const createServiceHandler = async (services: iService[]): Promise<FUNCTION_RESPONSE> => {
+export const createServiceHandler = async (services: any[]): Promise<FUNCTION_RESPONSE> => {
   await departmentValidations(services);
   await tagValidation(services);
+  services = services.map((item) => ({
+    name: item.name,
+    serviceId: item.serviceId,
+    department: item.department,
+    departmentType: item.departmentType,
+    tag: item.tag,
+    charges: [
+      {
+        opd: item.opd_one,
+        ipd: item.ipd_one,
+        four: item.four_one,
+        twin: item.twin_one,
+        single: item.single_one,
+        deluxe: item.deluxe_one,
+        vip: item.vip_one,
+      },
+      {
+        opd: item.opd_two,
+        ipd: item.ipd_two,
+        four: item.four_two,
+        twin: item.twin_two,
+        single: item.single_two,
+        deluxe: item.deluxe_two,
+        vip: item.vip_two,
+      },
+    ],
+  }));
   const createdServices = await createManyServices(services);
   return { status: 200, body: createdServices };
 };

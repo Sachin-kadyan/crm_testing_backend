@@ -16,13 +16,20 @@ export const create = [
     .notEmpty()
     .isString()
     .customSanitizer((value) => new ObjectId(value)),
-  body("*.opdCharge").notEmpty().toInt().isNumeric(),
-  body("*.ipdCharge").notEmpty().toInt().isNumeric(),
-  body("*.fourSharingRoomCharge").notEmpty().toInt().isNumeric(),
-  body("*.twinSharingRoomCharge").notEmpty().toInt().isNumeric(),
-  body("*.singleRoomCharge").notEmpty().toInt().isNumeric(),
-  body("*.deluxeRoomCharge").notEmpty().toInt().isNumeric(),
-  body("*.vipRoomCharge").notEmpty().toInt().isNumeric(),
+  body("*.opd_one").notEmpty().bail().toInt().isNumeric(),
+  body("*.opd_two").notEmpty().toInt().isNumeric(),
+  body("*.ipd_one").notEmpty().toInt().isNumeric(),
+  body("*.ipd_two").notEmpty().toInt().isNumeric(),
+  body("*.four_one").notEmpty().toInt().isNumeric(),
+  body("*.four_two").notEmpty().toInt().isNumeric(),
+  body("*.twin_one").notEmpty().toInt().isNumeric(),
+  body("*.twin_two").notEmpty().toInt().isNumeric(),
+  body("*.single_one").notEmpty().toInt().isNumeric(),
+  body("*.single_two").notEmpty().toInt().isNumeric(),
+  body("*.deluxe_one").notEmpty().toInt().isNumeric(),
+  body("*.deluxe_two").notEmpty().toInt().isNumeric(),
+  body("*.vip_one").notEmpty().toInt().isNumeric(),
+  body("*.vip_two").notEmpty().toInt().isNumeric(),
 ];
 
 export const get_services = [

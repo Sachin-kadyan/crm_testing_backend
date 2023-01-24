@@ -6,11 +6,13 @@ export interface iService {
   department: ObjectId;
   departmentType: ObjectId;
   tag: ObjectId;
-  opdCharge: number;
-  ipdCharge: number;
-  fourSharingRoomCharge: number;
-  twinSharingRoomCharge: number;
-  singleRoomCharge: number;
-  deluxeRoomCharge: number;
-  vipRoomCharge: number;
+  charges: {
+    opd: number;
+    ipd: number;
+    four: number;
+    twin: number;
+    single: number;
+    deluxe: number;
+    vip: number;
+  }[];
 }
