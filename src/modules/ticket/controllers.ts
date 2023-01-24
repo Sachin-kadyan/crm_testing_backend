@@ -42,14 +42,12 @@ export const createTicket = PromiseWrapper(
       throw new ErrorHandler("consumer doesn't exist", 404);
     }
     const departments: string[] = JSON.parse(req.body.departments);
-    departments.forEach((item) => {
-      getDepartmentById(new ObjectId(item)).then((dept) => {
-        if (dept === null) {
-          throw new ErrorHandler("Invalid department passed", 400);
-        }
-      });
-    });
-
+    for await (const department of departments) {
+      const dept = await getDepartmentById(new ObjectId(department));
+      if (dept === null) {
+        throw new ErrorHandler("Invalid department passed", 400);
+      }
+    }
     const doctor = await findDoctorById(ticket.doctor);
     if (doctor === null) {
       throw new ErrorHandler("Invalid doctor id passed", 400);
@@ -59,6 +57,7 @@ export const createTicket = PromiseWrapper(
     const { _id } = await createOnePrescription(
       {
         admission: ticket.admission,
+        service: ticket.service,
         condition: ticket.condition,
         consumer: ticket.consumer,
         departments: JSON.parse(req.body.departments).map((item: string) => new ObjectId(item)),

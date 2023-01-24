@@ -1,5 +1,6 @@
 import { body, param } from "express-validator";
 import { ObjectId } from "mongodb";
+import { DefaultDeserializer } from "v8";
 
 export const create = [
   body("consumer")
@@ -17,7 +18,16 @@ export const create = [
   body("followUp").notEmpty().toDate().notEmpty(),
   body("medicines").optional(),
   body("diagnostics").optional(),
-  body("admission").optional(),
+  body("admission")
+    .isString()
+    .customSanitizer((value) => (value === "none" ? null : value)),
+  body("service")
+    .optional()
+    .isString()
+    .bail()
+    .isHexadecimal()
+    .bail()
+    .customSanitizer((value) => new ObjectId(value)),
 ];
 
 export const createEstimate = [

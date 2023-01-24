@@ -22,6 +22,7 @@ export interface iPrescription {
   medicines: string[] | null;
   diagnostics: string[] | null;
   admission: string | null;
+  service?: ObjectId;
   _id?: ObjectId;
 }
 
