@@ -104,17 +104,15 @@ export const ticketsWithPrescription = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
     const tickets = await getConsumerTickets(new ObjectId(req.params.consumerId));
     const prescriptions = await getConsumerPrescriptions(new ObjectId(req.params.consumerId));
+    const ticketMap = new Map(tickets.map((item, index) => [item.prescription, index]));
     // mapping tickets with prescription
-    const consumerTicketsWithPrescription: any = [];
-    prescriptions.forEach((pres) => {
-      const prescriptionTicket = tickets.find(
-        (item) => item.prescription.toString() === pres._id?.toString()
-      );
-      if (prescriptionTicket) {
-        consumerTicketsWithPrescription.push({ ...prescriptionTicket, prescription: pres });
-      }
-    });
-    return res.status(200).json(consumerTicketsWithPrescription);
+    const populatedTickets = [];
+    for await (const prescription of prescriptions) {
+      prescription.image = getMedia(prescription.image);
+      const ticket = tickets[ticketMap.get(prescription._id!)!];
+      populatedTickets.push({ ...ticket, prescription });
+    }
+    return res.status(200).json(populatedTickets);
   }
 );
 
