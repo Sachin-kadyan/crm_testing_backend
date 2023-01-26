@@ -7,12 +7,14 @@ export interface CONSUMER {
   email: string;
   phone: string;
   uid: string;
-  dob: string | number | Date;
+  dob: string | number | Date;//age
   gender: "M" | "F" | "O";
   address: {
     house: number;
     city: string;
     state: string;
     postalCode: number;
-  };
+  };// remove
+  // caregiver checkbox
+  // name phone 
 }

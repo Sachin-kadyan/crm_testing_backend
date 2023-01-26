@@ -17,7 +17,7 @@ export const create = [
   body("symptoms").optional({ nullable: true }).notEmpty().bail().isString(),
   body("followUp").notEmpty().toDate().notEmpty(),
   body("medicines").optional(),
-  body("diagnostics").optional(),
+  body("diagnostics").optional().toArray().isArray(),
   body("admission")
     .isString()
     .customSanitizer((value) => (value === "none" ? null : value)),

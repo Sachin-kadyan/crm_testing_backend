@@ -21,7 +21,7 @@ const app: Express = express();
 const PORT = process.env.PORT;
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: "1mb" }));
 app.use(cors());
 
 app.get("/prod/", async (req: Request, res: Response) => {

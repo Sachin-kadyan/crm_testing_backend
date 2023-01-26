@@ -14,7 +14,7 @@ export const create = [
     .customSanitizer((value) => new ObjectId(value)),
   body("*.tag")
     .notEmpty()
-    .isString()
+    .isHexadecimal()
     .customSanitizer((value) => new ObjectId(value)),
   body("*.opd_one").notEmpty().bail().toInt().isNumeric(),
   body("*.opd_two").notEmpty().toInt().isNumeric(),

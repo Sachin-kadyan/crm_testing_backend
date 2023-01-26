@@ -13,17 +13,18 @@ export interface iTicket {
 
 export interface iPrescription {
   consumer: ObjectId;
-  departments: ObjectId[];
+  departments: ObjectId[]; // remove sub department
   doctor: ObjectId;
-  condition: string;
-  symptoms: string;
+  condition: string; //-
+  symptoms: string; //-
   followUp: string | number;
   image: string;
-  medicines: string[] | null;
+  medicines: string[] | null; //-
   diagnostics: string[] | null;
-  admission: string | null;
+  admission: string | null; // none to not advised
   service?: ObjectId;
   _id?: ObjectId;
+  // care giver
 }
 
 export interface iEstimate {

@@ -108,6 +108,10 @@ export const ticketsWithPrescription = PromiseWrapper(
     // mapping tickets with prescription
     const populatedTickets = [];
     for await (const prescription of prescriptions) {
+      if (prescription.admission !== null) {
+        /* @ts-ignore */
+        prescription.service = await findOneService({ _id: prescription.service! });
+      }
       prescription.image = getMedia(prescription.image);
       const ticket = tickets[ticketMap.get(prescription._id!)!];
       populatedTickets.push({ ...ticket, prescription });
