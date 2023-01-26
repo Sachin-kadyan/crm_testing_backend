@@ -1,5 +1,4 @@
 import { body } from "express-validator";
-import { ObjectId } from "mongodb";
 
 export const create = [
   body("name").notEmpty().toLowerCase(),
@@ -27,7 +26,7 @@ export const createWard = [
       return true;
     }),
   body("code").notEmpty().isString(),
-  body("roomRent").notEmpty().isNumeric(),
-  body("consultation").notEmpty().isNumeric(),
-  body("emergencyConsultation").notEmpty().isNumeric(),
+  body("charges.*.roomRent").notEmpty().isNumeric(),
+  body("charges.*.consultation").notEmpty().isNumeric(),
+  body("charges.*.emergencyConsultation").notEmpty().isNumeric(),
 ];
