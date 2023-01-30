@@ -174,6 +174,12 @@ export const getRepresentativeTickets = PromiseWrapper(
       .toArray();
     for await (const ticket of tickets) {
       ticket.prescription[0].image = getMedia(ticket.prescription[0].image);
+      if (ticket.prescription[0].service) {
+        const presService = await getServiceById(ticket.prescription[0].service);
+        if (presService) {
+          ticket.prescription[0].service = presService;
+        }
+      }
       ticket.createdAt = getCreateDate(ticket._id);
       ticket.prescription[0].createdAt = getCreateDate(ticket.prescription[0]._id);
       if (ticket.estimate[0]) {
