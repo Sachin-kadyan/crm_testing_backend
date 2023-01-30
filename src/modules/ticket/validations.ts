@@ -114,3 +114,5 @@ export const create_note = [
 ];
 
 export const get_notes = [param("ticketId").notEmpty()];
+
+export const upload_estimate = [param("ticketId").notEmpty().isHexadecimal()];

@@ -1,9 +1,15 @@
 export const whatsappEstimatePayload = (location: string) => {
-  return {
-    type: "document",
-    document: {
-      link: location,
-      filename: "Estimate",
+  return [
+    {
+      type: "header",
+      parameters: [
+        {
+          type: "document",
+          document: {
+            link: location,
+          },
+        },
+      ],
     },
-  };
+  ];
 };

@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { ClientSession, Collection, ObjectId } from "mongodb";
 import PromiseWrapper from "../../middleware/promiseWrapper";
 import { getMedia, putMedia } from "../../services/aws/s3";
+import { sendMessage, sendTemplateMessage } from "../../services/whatsapp/whatsapp";
 import { iEstimate, iPrescription, iTicket } from "../../types/ticket/ticket";
 import ErrorHandler from "../../utils/errorHandler";
 import MongoService, { Collections, getCreateDate } from "../../utils/mongo";
@@ -13,8 +14,15 @@ import { getSortedLeadCountRepresentatives } from "../representative/functions";
 import { findOneService } from "../service/crud";
 import { getServiceById } from "../service/functions";
 import { findStageByCode } from "../stages/functions";
-import { createOnePrescription, findPrescription, findPrescriptionById, findTicket } from "./crud";
+import {
+  createOnePrescription,
+  findPrescription,
+  findPrescriptionById,
+  findTicket,
+  findTicketById,
+} from "./crud";
 import generateEstimate from "./estimate/createEstimate";
+import { whatsappEstimatePayload } from "./estimate/utils";
 import {
   createEstimate,
   createNote,
@@ -86,6 +94,12 @@ export const createTicket = PromiseWrapper(
       });
       return res.status(status).json(body);
     }
+    if (req.body.admission !== null) {
+      const flowConnect = await findFlowConnectorByService(req.body.service); // start flow associated with this service
+      if (flowConnect !== null && consumer !== null) {
+        await startTemplateFlow(flowConnect.templateName, flowConnect.templateLanguage, consumer.phone);
+      }
+    }
   }
 );
 
@@ -104,7 +118,7 @@ export const ticketsWithPrescription = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
     const tickets = await getConsumerTickets(new ObjectId(req.params.consumerId));
     const prescriptions = await getConsumerPrescriptions(new ObjectId(req.params.consumerId));
-    const ticketMap = new Map(tickets.map((item, index) => [item.prescription, index]));
+    const ticketMap = new Map(tickets.map((item, index) => [item.prescription.toString(), index]));
     // mapping tickets with prescription
     const populatedTickets = [];
     for await (const prescription of prescriptions) {
@@ -113,7 +127,7 @@ export const ticketsWithPrescription = PromiseWrapper(
         prescription.service = await findOneService({ _id: prescription.service! });
       }
       prescription.image = getMedia(prescription.image);
-      const ticket = tickets[ticketMap.get(prescription._id!)!];
+      const ticket = tickets[ticketMap.get(prescription._id!.toString())!];
       populatedTickets.push({ ...ticket, prescription });
     }
     return res.status(200).json(populatedTickets);
@@ -195,11 +209,6 @@ export const createEstimateController = PromiseWrapper(
     const consumer = await findConsumerById(prescription.consumer);
     const estimate = await createEstimate({ ...estimateBody, creator: new ObjectId(req.user!._id) }, session);
     await generateEstimate(estimate._id, session); // creates and send estimate pdf
-    const flowConnect = await findFlowConnectorByService(estimateBody.service[0].id); // start flow associated with this service
-    if (flowConnect !== null && consumer !== null) {
-      await startTemplateFlow(flowConnect.templateName, flowConnect.templateLanguage, consumer.phone);
-    }
-
     return res.status(200).json(estimate);
   }
 );
@@ -229,3 +238,31 @@ export const GetTicketNotes = PromiseWrapper(async (req: Request, res: Response,
   const notes = await getTicketNotes(new ObjectId(req.params.ticketId));
   res.status(200).json(notes);
 });
+
+// estimate upload and send
+export const EstimateUploadAndSend = PromiseWrapper(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const file = req.file;
+    const ticketId = req.params.ticketId;
+    const ticket = await findTicketById(new ObjectId(ticketId));
+    if (!ticket) throw new ErrorHandler("Ticket Not Found", 404);
+    const consumer = await findConsumerById(ticket.consumer);
+    if (!consumer) throw new ErrorHandler("No Consumer Found.", 404);
+    if (!file) throw new ErrorHandler("No Estimate File Found.", 404);
+    const { Location } = await putMedia(
+      file,
+      `patients/${ticket.consumer}/${ticket._id}/estimates`,
+      process.env.PUBLIC_BUCKET_NAME
+    );
+    await sendMessage(consumer!.phone, {
+      type: "document",
+      document: {
+        link: Location,
+        filename: "Estimate",
+      },
+    });
+
+    // await sendTemplateMessage(consumer!.phone, "estimate", "en-us", whatsappEstimatePayload(Location));
+    return res.sendStatus(200);
+  }
+);

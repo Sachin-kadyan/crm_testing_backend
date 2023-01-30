@@ -17,8 +17,4 @@ export const create = [
       }
       return value;
     }),
-  body("address.house").notEmpty(),
-  body("address.city").notEmpty(),
-  body("address.state").notEmpty(),
-  body("address.postalCode").notEmpty(),
 ];
