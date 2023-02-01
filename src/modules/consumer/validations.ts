@@ -6,6 +6,7 @@ export const create = [
   body("email").isEmail().toLowerCase(),
   body("dob").toDate().notEmpty(),
   body("phone")
+    .isLength({ max: 10, min: 10 })
     .isMobilePhone("en-IN")
     .customSanitizer((value) => "91" + value),
   body("uid").notEmpty(),
