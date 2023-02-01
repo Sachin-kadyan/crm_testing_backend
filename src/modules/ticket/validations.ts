@@ -15,7 +15,7 @@ export const create = [
     .notEmpty(),
   body("condition").optional({ nullable: true }).notEmpty().bail().isString().toLowerCase(),
   body("symptoms").optional({ nullable: true }).notEmpty().bail().isString(),
-  body("followUp").notEmpty().toDate().notEmpty(),
+  body("followUp").optional({ nullable: true }).notEmpty().toDate().notEmpty(),
   body("medicines").optional(),
   body("diagnostics").optional().toArray().isArray(),
   body("admission")
