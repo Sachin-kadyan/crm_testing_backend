@@ -12,24 +12,7 @@ export const createTextPayload = (message: string, sender: string) => {
 };
 
 export const createReplyPayload = (node: iReplyNode) => {
-  const payload: {
-    type: string;
-    interactive: {
-      type: "button";
-      header?: any;
-      body: { text: string };
-      footer?: string;
-      action: {
-        buttons: {
-          type: "reply";
-          reply: {
-            id: string;
-            title: string;
-          };
-        }[];
-      };
-    };
-  } = {
+  const payload: any = {
     type: "interactive",
     interactive: {
       type: "button",
@@ -53,7 +36,7 @@ export const createReplyPayload = (node: iReplyNode) => {
     payload.interactive.header = createHeader(node.headerType, node.headerLink);
   }
   if (node.footer) {
-    payload.interactive.footer = node.footer;
+    payload.interactive.footer = { text: node.footer };
   }
   if (node.replyButton2) {
     payload.interactive.action.buttons.push({
@@ -102,7 +85,7 @@ export const createListPayload = (node: iListNode) => {
     },
   };
   if (node.footer) {
-    payload.interactive.footer.text = node.footer;
+    payload.interactive.footer = { text: node.footer };
   }
   if (node.listId1 && node.listTitle1) {
     payload.interactive.action.sections[0].rows.push({

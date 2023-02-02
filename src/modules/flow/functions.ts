@@ -34,8 +34,13 @@ export const findAndSendNode = async (nodeIdentifier: string, receiver: string, 
   await saveFlowMessages(ticket, node._id!);
 };
 
-export const startTemplateFlow = async (templateName: string, templateLanguage: string, receiver: string) => {
-  return await sendTemplateMessage(receiver, templateName, templateLanguage);
+export const startTemplateFlow = async (
+  templateName: string,
+  templateLanguage: string,
+  receiver: string,
+  components: any
+) => {
+  return await sendTemplateMessage(receiver, templateName, templateLanguage, components);
 };
 
 // connect flow

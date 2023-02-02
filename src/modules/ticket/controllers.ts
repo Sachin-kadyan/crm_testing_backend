@@ -75,6 +75,8 @@ export const createTicket = PromiseWrapper(
         followUp: ticket.followUp,
         image: Key,
         symptoms: ticket.symptoms,
+        caregiver_name: ticket.caregiver_name,
+        caregiver_phone: ticket.caregiver_phone,
       },
       session
     );
@@ -92,13 +94,24 @@ export const createTicket = PromiseWrapper(
         assigned: representatives[0]._id,
         stage: stage._id!,
       });
-      return res.status(status).json(body);
-    }
-    if (req.body.admission !== null) {
-      const flowConnect = await findFlowConnectorByService(req.body.service); // start flow associated with this service
-      if (flowConnect !== null && consumer !== null) {
-        await startTemplateFlow(flowConnect.templateName, flowConnect.templateLanguage, consumer.phone);
+      if (req.body.admission !== null) {
+        const components = [
+          {
+            type: "body",
+            parameters: [
+              {
+                type: "text",
+                text:
+                  consumer.firstName.toUpperCase() +
+                  " " +
+                  (consumer.lastName ? consumer.lastName.toUpperCase() : ""),
+              },
+            ],
+          },
+        ];
+        await startTemplateFlow("flow", "en", consumer.phone, components);
       }
+      return res.status(status).json(body);
     }
   }
 );
@@ -272,3 +285,5 @@ export const EstimateUploadAndSend = PromiseWrapper(
     return res.sendStatus(200);
   }
 );
+
+

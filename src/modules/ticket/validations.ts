@@ -1,6 +1,5 @@
 import { body, param } from "express-validator";
 import { ObjectId } from "mongodb";
-import { DefaultDeserializer } from "v8";
 
 export const create = [
   body("consumer")
@@ -28,6 +27,12 @@ export const create = [
     .isHexadecimal()
     .bail()
     .customSanitizer((value) => new ObjectId(value)),
+  body("caregiver_name").optional({ nullable: true }).isString(),
+  body("caregiver_phone")
+    .optional({ nullable: true })
+    .isLength({ min: 10, max: 10 })
+    .isMobilePhone("en-IN")
+    .customSanitizer((value) => "91" + value),
 ];
 
 export const createEstimate = [

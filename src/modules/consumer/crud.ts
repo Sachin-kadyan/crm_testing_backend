@@ -5,7 +5,7 @@ import getDatabase from "../../utils/mongo";
 
 export const CONSUMER_DB = "consumer";
 
-const createSearchIndex = async () => {
+export const createConsumerIndex = async () => {
   await MongoService.collection(CONSUMER_DB).createIndex({
     firstName: "text",
     lastName: "text",
@@ -15,8 +15,6 @@ const createSearchIndex = async () => {
     dob: "text",
   });
 };
-
-// createSearchIndex();
 
 export const createConsumer = async (consumer: CONSUMER): Promise<CONSUMER> => {
   await MongoService.collection(CONSUMER_DB).insertOne(consumer);

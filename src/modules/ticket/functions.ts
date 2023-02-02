@@ -1,4 +1,5 @@
 import { ClientSession, Collection, ObjectId } from "mongodb";
+import { findConsumerFromWAID } from "../../services/whatsapp/webhook";
 import { FUNCTION_RESPONSE } from "../../types/api/api";
 import { iEstimate, iNote, iPrescription, iTicket } from "../../types/ticket/ticket";
 import MongoService, { Collections } from "../../utils/mongo";
@@ -41,6 +42,19 @@ export const searchService = async (
 
 export const getPrescriptionById = async (id: ObjectId) => {
   return await MongoService.collection(Collections.PRESCRIPTION).findOne<iPrescription>({ _id: id });
+};
+
+export const findPrescriptionFromWAID = async (waid: string) => {
+  const { consumer } = await findConsumerFromWAID(waid);
+  if (consumer) {
+    return await MongoService.collection(Collections.PRESCRIPTION).findOne<iPrescription>({
+      consumer: consumer,
+    });
+  } else {
+    return await MongoService.collection(Collections.PRESCRIPTION).findOne<iPrescription>({
+      caregiver_phone: waid,
+    });
+  }
 };
 
 //estimate

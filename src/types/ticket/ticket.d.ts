@@ -24,6 +24,8 @@ export interface iPrescription {
   admission: string | null; // none to not advised
   service?: ObjectId;
   _id?: ObjectId;
+  caregiver_name?: string;
+  caregiver_phone?: string;
   // care giver
 }
 

@@ -29,6 +29,7 @@ app.get("/prod/", async (req: Request, res: Response) => {
 });
 
 app.use("/prod/api/v1/", moduleRoutes);
+
 app.use((err: ErrorHandler, req: Request, res: Response, next: NextFunction) => {
   const status = err.code || 500;
   const message = err.message || "Internal Server Error";
