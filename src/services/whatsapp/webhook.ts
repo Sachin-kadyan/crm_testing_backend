@@ -21,6 +21,7 @@ export const saveMessageFromWebhook = async (payload: iWebhookPayload, consumer:
               ticket: ticket,
               type: "received",
               messageType: "text",
+              createdAt: Date.now(),
             };
             await saveMessage(ticket, messagePayload);
           } else if (message.button) {
@@ -31,6 +32,7 @@ export const saveMessageFromWebhook = async (payload: iWebhookPayload, consumer:
               ticket: ticket.toString(),
               type: "received",
               messageType: "text",
+              createdAt: Date.now(),
             };
             await saveMessage(ticket.toString(), messagePayload);
           } else if (message.interactive) {
@@ -42,6 +44,7 @@ export const saveMessageFromWebhook = async (payload: iWebhookPayload, consumer:
                 ticket: ticket,
                 type: "received",
                 messageType: "text",
+                createdAt: Date.now(),
               };
               await saveMessage(ticket, messagePayload);
             } else {
@@ -53,6 +56,7 @@ export const saveMessageFromWebhook = async (payload: iWebhookPayload, consumer:
                 ticket: ticket,
                 type: "received",
                 messageType: "text",
+                createdAt: Date.now(),
               };
               await saveMessage(ticket, messagePayload);
             }

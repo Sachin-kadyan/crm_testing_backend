@@ -66,4 +66,5 @@ interface iTextMessage {
   ticket: string;
   consumer: string;
   messageType: "text";
+  createdAt: number;
 }

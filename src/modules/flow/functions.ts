@@ -1,4 +1,5 @@
 import { ClientSession, Collection, ObjectId } from "mongodb";
+import firestore, { fsCollections } from "../../services/firebase/firebase";
 import { findConsumerFromWAID, saveFlowMessages } from "../../services/whatsapp/webhook";
 import { sendMessage, sendTemplateMessage } from "../../services/whatsapp/whatsapp";
 import { iFlowConnect, iListNode, iReplyNode } from "../../types/flow/reply";
@@ -31,7 +32,17 @@ export const findAndSendNode = async (nodeIdentifier: string, receiver: string, 
     const listPayload = createListPayload(node);
     await sendMessage(receiver, listPayload);
   }
-  await saveFlowMessages(ticket, node._id!);
+  // await saveFlowMessages(ticket, node._id!);
+  await saveSentFlowMessage(ticket.toString(), node);
+};
+
+export const saveSentFlowMessage = async (ticket: string, node: any) => {
+  return await firestore
+    .collection(fsCollections.TICKET)
+    .doc(ticket)
+    .collection(fsCollections.MESSAGES)
+    .doc()
+    .set({ ...node, createdAt: Date.now(), type: "sent" });
 };
 
 export const startTemplateFlow = async (
