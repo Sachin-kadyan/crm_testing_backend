@@ -39,7 +39,7 @@ export const findAndSendNode = async (nodeIdentifier: string, receiver: string, 
 export const saveSentFlowMessage = async (ticket: string, node: any) => {
   return await firestore
     .collection(fsCollections.TICKET)
-    .doc(ticket)
+    .doc(ticket.toString())
     .collection(fsCollections.MESSAGES)
     .doc()
     .set({ ...node, createdAt: Date.now(), type: "sent" });

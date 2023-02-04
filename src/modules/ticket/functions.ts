@@ -1,9 +1,10 @@
 import { ClientSession, Collection, ObjectId } from "mongodb";
 import { findConsumerFromWAID } from "../../services/whatsapp/webhook";
 import { FUNCTION_RESPONSE } from "../../types/api/api";
+import { CONSUMER } from "../../types/consumer/consumer";
 import { iEstimate, iNote, iPrescription, iTicket } from "../../types/ticket/ticket";
 import MongoService, { Collections } from "../../utils/mongo";
-import { createOnePrescription, createOneTicket, findServices } from "./crud";
+import { createOnePrescription, createOneTicket, findServices, findTicket } from "./crud";
 
 export const createTicketHandler = async (ticket: iTicket): Promise<FUNCTION_RESPONSE> => {
   const createdTicket = await createOneTicket(ticket);
@@ -44,17 +45,14 @@ export const getPrescriptionById = async (id: ObjectId) => {
   return await MongoService.collection(Collections.PRESCRIPTION).findOne<iPrescription>({ _id: id });
 };
 
-export const findPrescriptionFromWAID = async (waid: string) => {
-  const { consumer } = await findConsumerFromWAID(waid);
-  if (consumer) {
-    return await MongoService.collection(Collections.PRESCRIPTION).findOne<iPrescription>({
-      consumer: consumer,
-    });
-  } else {
-    return await MongoService.collection(Collections.PRESCRIPTION).findOne<iPrescription>({
-      caregiver_phone: waid,
-    });
-  }
+export const findTicketAndPrescriptionFromWAID = async (waid: string) => {
+  const consumer = await MongoService.collection("consumer").findOne<CONSUMER>({ phone: waid });
+  const query = consumer ? { consumer: consumer._id } : { caregiver_phone: waid };
+  const prescription = await MongoService.collection(Collections.PRESCRIPTION).findOne<iPrescription>(query);
+  const ticket = await MongoService.collection(Collections.TICKET).findOne<iTicket>({
+    prescription: prescription?._id,
+  });
+  return { prescription, ticket };
 };
 
 //estimate

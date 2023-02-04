@@ -12,7 +12,7 @@ import { iWebhookPayload } from "../../types/flow/webhook";
 import ErrorHandler from "../../utils/errorHandler";
 import { findConsumerById } from "../consumer/functions";
 import { findOneService } from "../service/crud";
-import { findPrescriptionFromWAID } from "../ticket/functions";
+import { findTicketAndPrescriptionFromWAID } from "../ticket/functions";
 import {
   connectFlow,
   createListNode,
@@ -59,25 +59,32 @@ export const HandleWebhook = async (req: Request, res: Response, next: NextFunct
         changes.value.messages.forEach((message, mi) => {
           (async function () {
             try {
-              const { consumer, ticket } = await findConsumerFromWAID(changes.value.contacts[mi].wa_id);
-              if (message.button) {
-                const prescription = await findPrescriptionFromWAID(changes.value.contacts[mi].wa_id);
-                // const connector = await findFlowConnectorByTemplateIdentifier(message.button.text);
-                if (prescription && prescription.service) {
-                  await findAndSendNode(
-                    prescription.service.toString(),
-                    changes.value.contacts[mi].wa_id,
-                    ticket
-                  );
-                  await saveMessageFromWebhook(body, consumer.toString(), ticket.toString()); // saving message
+              const { prescription, ticket } = await findTicketAndPrescriptionFromWAID(
+                changes.value.contacts[mi].wa_id
+              );
+              if (prescription && ticket && ticket?._id) {
+                if (message.button) {
+                  // const connector = await findFlowConnectorByTemplateIdentifier(message.button.text);
+                  if (prescription && prescription.service && ticket) {
+                    await saveMessageFromWebhook(
+                      body,
+                      prescription.consumer.toString(),
+                      ticket._id.toString()
+                    ); // saving message
+                    await findAndSendNode(
+                      prescription.service.toString(),
+                      changes.value.contacts[mi].wa_id,
+                      ticket._id
+                    );
+                  }
+                } else if (message.interactive) {
+                  const nodeIdentifier =
+                    message.interactive.type === "button_reply"
+                      ? message.interactive.button_reply.id
+                      : message.interactive.list_reply.id;
+                  await saveMessageFromWebhook(body, prescription?.consumer.toString(), ticket.toString()); // saving message
+                  await findAndSendNode(nodeIdentifier, changes.value.contacts[mi].wa_id, ticket._id);
                 }
-              } else if (message.interactive) {
-                const nodeIdentifier =
-                  message.interactive.type === "button_reply"
-                    ? message.interactive.button_reply.id
-                    : message.interactive.list_reply.id;
-                await findAndSendNode(nodeIdentifier, changes.value.contacts[mi].wa_id, ticket);
-                await saveMessageFromWebhook(body, consumer.toString(), ticket.toString()); // saving message
               }
             } catch (error: any) {
               console.log(error.message);
