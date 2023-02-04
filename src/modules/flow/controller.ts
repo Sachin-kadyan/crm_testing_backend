@@ -72,7 +72,7 @@ export const HandleWebhook = async (req: Request, res: Response, next: NextFunct
                       ticket._id.toString()
                     ); // saving message
                     await findAndSendNode(
-                      prescription.service.toString(),
+                      prescription.service ? prescription.service.toString() : "DF",
                       changes.value.contacts[mi].wa_id,
                       ticket._id
                     );
