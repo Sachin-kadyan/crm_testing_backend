@@ -46,8 +46,9 @@ export const getPrescriptionById = async (id: ObjectId) => {
 };
 
 export const findTicketAndPrescriptionFromWAID = async (waid: string) => {
-  const consumer = await MongoService.collection("consumer").findOne<CONSUMER>({ phone: waid });
-  const query = consumer ? { consumer: consumer._id } : { caregiver_phone: waid };
+  const consumer = await MongoService.collection("consumer").find<CONSUMER>({ phone: waid }).toArray();
+  const consumerIds = consumer.map((item) => item._id);
+  const query = consumer ? { consumer: { $in: consumerIds } } : { caregiver_phone: waid };
   const prescription = await MongoService.collection(Collections.PRESCRIPTION).findOne<iPrescription>(query, {
     sort: { $natural: -1 },
   });
