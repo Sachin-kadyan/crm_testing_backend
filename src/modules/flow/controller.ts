@@ -64,27 +64,23 @@ export const HandleWebhook = async (req: Request, res: Response, next: NextFunct
               );
               if (prescription && ticket && ticket?._id) {
                 if (message.button) {
-                  // const connector = await findFlowConnectorByTemplateIdentifier(message.button.text);
-                  if (prescription && prescription.service && ticket) {
-                    await saveMessageFromWebhook(
-                      body,
-                      prescription.consumer.toString(),
-                      ticket._id.toString()
-                    ); // saving message
-                    await findAndSendNode(
-                      prescription.service ? prescription.service.toString() : "DF",
-                      changes.value.contacts[mi].wa_id,
-                      ticket._id
-                    );
-                  }
+                  await findAndSendNode(
+                    prescription.service ? prescription.service.toString() : "DF",
+                    changes.value.contacts[mi].wa_id,
+                    ticket._id.toString()
+                  );
                 } else if (message.interactive) {
                   const nodeIdentifier =
                     message.interactive.type === "button_reply"
                       ? message.interactive.button_reply.id
                       : message.interactive.list_reply.id;
-                  await saveMessageFromWebhook(body, prescription?.consumer.toString(), ticket.toString()); // saving message
-                  await findAndSendNode(nodeIdentifier, changes.value.contacts[mi].wa_id, ticket._id);
+                  await findAndSendNode(
+                    nodeIdentifier,
+                    changes.value.contacts[mi].wa_id,
+                    ticket._id.toString()
+                  );
                 }
+                await saveMessageFromWebhook(body, prescription?.consumer.toString(), ticket.toString()); // saving message
               }
             } catch (error: any) {
               console.log(error.message);

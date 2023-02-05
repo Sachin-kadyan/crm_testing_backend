@@ -22,7 +22,7 @@ const findNodeById = async (nodeId: ObjectId) => {
   return await MongoService.collection(Collections.FLOW).findOne<iReplyNode | iListNode>({ _id: nodeId });
 };
 
-export const findAndSendNode = async (nodeIdentifier: string, receiver: string, ticket: ObjectId) => {
+export const findAndSendNode = async (nodeIdentifier: string, receiver: string, ticket: string) => {
   const node = await findNodeWithId(nodeIdentifier);
   if (node === null) throw new Error("Node not found");
   if (node.type === "reply") {
@@ -34,13 +34,13 @@ export const findAndSendNode = async (nodeIdentifier: string, receiver: string, 
   }
   delete node._id;
   // await saveFlowMessages(ticket, node._id!);
-  await saveSentFlowMessage(ticket.toString(), node);
+  await saveSentFlowMessage(ticket, node);
 };
 
 export const saveSentFlowMessage = async (ticket: string, node: any) => {
   return await firestore
     .collection(fsCollections.TICKET)
-    .doc(ticket.toString())
+    .doc(ticket)
     .collection(fsCollections.MESSAGES)
     .doc()
     .set({ ...node, createdAt: Date.now(), type: "sent" });

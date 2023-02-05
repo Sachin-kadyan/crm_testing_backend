@@ -34,7 +34,7 @@ export const saveMessageFromWebhook = async (payload: iWebhookPayload, consumer:
               messageType: "text",
               createdAt: Date.now(),
             };
-            await saveMessage(ticket.toString(), messagePayload);
+            await saveMessage(ticket, messagePayload);
           } else if (message.interactive) {
             if (message.interactive.type === "button_reply") {
               const messagePayload: iTextMessage = {
