@@ -26,10 +26,10 @@ export const saveMessageFromWebhook = async (payload: iWebhookPayload, consumer:
             await saveMessage(ticket, messagePayload);
           } else if (message.button) {
             const messagePayload: iTextMessage = {
-              consumer: consumer.toString(),
+              consumer: consumer,
               sender: changes.value.contacts[mi].wa_id,
               text: message.button.text,
-              ticket: ticket.toString(),
+              ticket: ticket,
               type: "received",
               messageType: "text",
               createdAt: Date.now(),
@@ -70,7 +70,7 @@ export const saveMessageFromWebhook = async (payload: iWebhookPayload, consumer:
 export const saveMessage = async (ticket: string, message: any) => {
   return await firestore
     .collection(fsCollections.TICKET)
-    .doc(ticket.toString())
+    .doc(ticket)
     .collection(fsCollections.MESSAGES)
     .doc()
     .set(message);

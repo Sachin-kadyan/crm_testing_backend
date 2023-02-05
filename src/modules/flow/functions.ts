@@ -32,6 +32,7 @@ export const findAndSendNode = async (nodeIdentifier: string, receiver: string, 
     const listPayload = createListPayload(node);
     await sendMessage(receiver, listPayload);
   }
+  delete node._id;
   // await saveFlowMessages(ticket, node._id!);
   await saveSentFlowMessage(ticket.toString(), node);
 };
