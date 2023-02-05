@@ -80,7 +80,7 @@ export const HandleWebhook = async (req: Request, res: Response, next: NextFunct
                     ticket._id.toString()
                   );
                 }
-                await saveMessageFromWebhook(body, prescription?.consumer.toString(), ticket.toString()); // saving message
+                await saveMessageFromWebhook(body, prescription.consumer.toString(), ticket._id.toString()); // saving message
               }
             } catch (error: any) {
               console.log(error.message);
