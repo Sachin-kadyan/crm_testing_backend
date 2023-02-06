@@ -62,7 +62,13 @@ export const HandleWebhook = async (req: Request, res: Response, next: NextFunct
               const { prescription, ticket } = await findTicketAndPrescriptionFromWAID(
                 changes.value.contacts[mi].wa_id
               );
+              const departmentSet = new Set([
+                "63ce58474dca242deb6a4d41",
+                "63ce59964dca242deb6a4d4c",
+                "63ce59314dca242deb6a4d48",
+              ]);
               if (prescription && ticket && ticket?._id) {
+                if (!departmentSet.has(prescription?.departments[0].toString())) return;
                 if (message.button) {
                   await findAndSendNode(
                     prescription.service ? prescription.service.toString() : "DF",
