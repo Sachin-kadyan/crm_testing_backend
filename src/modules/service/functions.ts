@@ -64,7 +64,10 @@ export const createServiceHandler = async (services: any[]): Promise<FUNCTION_RE
 };
 
 export const searchService = async (searchQuery: string, tag: string): Promise<FUNCTION_RESPONSE> => {
-  const query: any = { $text: { $search: searchQuery } };
+  // const query: any = {
+  //   $text: { $search: `/${searchQuery}/i`, $caseSensitive: false, $diacriticSensitive: false },
+  // };
+  const query: any = { name: { $regex: searchQuery, $options: "i" } };
   tag && (query.tag = new ObjectId(tag));
   const services = await findServices(query);
   return { status: 200, body: services };

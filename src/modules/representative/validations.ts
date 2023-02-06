@@ -18,4 +18,4 @@ export const create = [
   body("password").notEmpty().isStrongPassword({ minLength: 6 }),
 ];
 
-export const login = [body("email").isEmail().toLowerCase(), body("password").notEmpty()];
+export const login = [body("phone").isMobilePhone("en-IN").isInt().toInt(), body("password").notEmpty()];

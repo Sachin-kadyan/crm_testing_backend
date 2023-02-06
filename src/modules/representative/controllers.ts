@@ -8,6 +8,6 @@ export const register = PromiseWrapper(async (req: Request, res: Response, next:
 });
 
 export const login = PromiseWrapper(async (req: Request, res: Response, next: NextFunction) => {
-  const { status, body } = await loginRepresentativeHandler(req.body.email, req.body.password);
+  const { status, body } = await loginRepresentativeHandler(req.body.phone, req.body.password);
   res.status(status).json(body);
 });

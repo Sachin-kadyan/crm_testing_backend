@@ -23,15 +23,15 @@ const createTokens = (representative: iRepresentative): { access: string; refres
   }
 };
 
-const checkExistingRepresentative = async (email: string) => {
-  const respresentative = await findRepresentative({ email });
+const checkExistingRepresentative = async (phone: string) => {
+  const respresentative = await findRepresentative({ phone });
   if (respresentative) throw new ErrorHandler("Representative Already Exist", 400);
 };
 
 export const registerRepresentativeHandler = async (
   representative: iRepresentative
 ): Promise<FUNCTION_RESPONSE> => {
-  await checkExistingRepresentative(representative.email);
+  await checkExistingRepresentative(representative.phone);
   representative.password = await createPassword(representative.password!);
   const registeredUser = await createRepresentative(representative);
   delete registeredUser.password;
@@ -40,13 +40,13 @@ export const registerRepresentativeHandler = async (
 };
 
 export const loginRepresentativeHandler = async (
-  email: string,
+  phone: string,
   password: string
 ): Promise<FUNCTION_RESPONSE> => {
-  const representative = await findRepresentative({ email });
+  const representative = await findRepresentative({ phone });
   if (!representative) throw new ErrorHandler("NOT FOUND", 404);
   const matchPassword = await bcrypt.compare(password, representative.password as string);
-  if (!matchPassword) throw new ErrorHandler("Incorrect email or password!", 401);
+  if (!matchPassword) throw new ErrorHandler("Incorrect phone or password!", 401);
   delete representative.password;
   const { refresh, access } = createTokens(representative);
   return { status: 200, body: { ...representative, access, refresh } };
