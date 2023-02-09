@@ -93,7 +93,7 @@ export const createTicket = PromiseWrapper(
         creator: new ObjectId(req.user!._id),
         assigned: representatives[0]._id,
         stage: stage._id!,
-      });
+      }, session);
       if (req.body.admission !== null) {
         const components = [
           {

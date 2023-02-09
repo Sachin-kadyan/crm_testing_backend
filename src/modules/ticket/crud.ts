@@ -41,8 +41,8 @@ export const findServices = async (query: Object) => {
 };
 
 // ticket
-export const createOneTicket = async (ticket: iTicket): Promise<iTicket> => {
-  await MongoService.collection(TICKET_DB).insertOne(ticket);
+export const createOneTicket = async (ticket: iTicket, session: ClientSession): Promise<iTicket> => {
+  await MongoService.collection(TICKET_DB).insertOne(ticket, { session });
   return ticket;
 };
 

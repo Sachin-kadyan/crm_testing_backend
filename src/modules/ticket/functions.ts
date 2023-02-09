@@ -6,8 +6,8 @@ import { iEstimate, iNote, iPrescription, iTicket } from "../../types/ticket/tic
 import MongoService, { Collections } from "../../utils/mongo";
 import { createOnePrescription, createOneTicket, findServices, findTicket } from "./crud";
 
-export const createTicketHandler = async (ticket: iTicket): Promise<FUNCTION_RESPONSE> => {
-  const createdTicket = await createOneTicket(ticket);
+export const createTicketHandler = async (ticket: iTicket, session: ClientSession): Promise<FUNCTION_RESPONSE> => {
+  const createdTicket = await createOneTicket(ticket, session);
   return { status: 200, body: createdTicket };
 };
 
