@@ -87,13 +87,16 @@ export const createTicket = PromiseWrapper(
       const stage = await findStageByCode(0);
       const representatives = await getSortedLeadCountRepresentatives();
       if (representatives.length === 0) throw new ErrorHandler("Representatives Not Found", 422);
-      const { status, body } = await createTicketHandler({
-        consumer: ticket.consumer,
-        prescription: _id,
-        creator: new ObjectId(req.user!._id),
-        assigned: representatives[0]._id,
-        stage: stage._id!,
-      }, session);
+      const { status, body } = await createTicketHandler(
+        {
+          consumer: ticket.consumer,
+          prescription: _id,
+          creator: new ObjectId(req.user!._id),
+          assigned: representatives[0]._id,
+          stage: stage._id!,
+        },
+        session
+      );
       if (req.body.admission !== null) {
         const components = [
           {
@@ -181,6 +184,20 @@ export const getRepresentativeTickets = PromiseWrapper(
               { $limit: 1 },
             ],
             as: "estimate",
+          },
+        },
+        {
+          $lookup: {
+            from: Collections.REPRESENTATIVE,
+            localField: "creator",
+            let: { creator: "$creator" },
+            pipeline: [
+              { $match: { $expr: { $eq: ["$_id", "$$creator"] } } },
+              { $limit: 1 },
+              { $project: { firstName: 1, lastName: 1, email: 1, phone: 1 } },
+            ],
+            foreignField: "_id",
+            as: "creator",
           },
         },
       ])
@@ -285,5 +302,3 @@ export const EstimateUploadAndSend = PromiseWrapper(
     return res.sendStatus(200);
   }
 );
-
-
