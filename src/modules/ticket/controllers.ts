@@ -3,6 +3,7 @@ import { ClientSession, Collection, ObjectId } from "mongodb";
 import PromiseWrapper from "../../middleware/promiseWrapper";
 import { getMedia, putMedia } from "../../services/aws/s3";
 import { sendMessage, sendTemplateMessage } from "../../services/whatsapp/whatsapp";
+import { iReminder } from "../../types/task/task";
 import { iEstimate, iPrescription, iTicket } from "../../types/ticket/ticket";
 import ErrorHandler from "../../utils/errorHandler";
 import MongoService, { Collections, getCreateDate } from "../../utils/mongo";
@@ -14,6 +15,7 @@ import { getSortedLeadCountRepresentatives } from "../representative/functions";
 import { findOneService } from "../service/crud";
 import { getServiceById } from "../service/functions";
 import { findStageByCode } from "../stages/functions";
+import { createReminder } from "../task/functions";
 import {
   createOnePrescription,
   findPrescription,
@@ -114,6 +116,27 @@ export const createTicket = PromiseWrapper(
         ];
         await startTemplateFlow("flow", "en", consumer.phone, components);
       }
+      // const followUpDateOne = new Date(ticket.followUp);
+      // followUpDateOne.setHours(09);
+      // followUpDateOne.setMinutes(0);
+      // followUpDateOne.setDate(followUpDateOne.getDate() - 2);
+      // const reminder: iReminder = {
+      //   creator: req.user!._id,
+      //   date: followUpDateOne,
+      //   description: `Good morning Mr/Mrs/Ms  ${
+      //     consumer.firstName
+      //   }. Your wellbeing is important to us. This is a gentle reminder that you are due for an appointment with 🩺Dr ${
+      //     ticket.doctor
+      //   } on ${ticket.followUp.toString().split("T")[0]}. 🗓️
+      //   You are advised to bring all the previous prescriptions and lab reports, if any, as advised by your doctor.
+      //   ⏱️In case you wish to reschedule your appointment, please feel free to contact us on 07087105902.
+      //   🏥Paras Hospital cares for you. Looking forward to provide you with our best healthcare services.
+      //   Warm Regards
+      //   Paras Hospital, Panchkula`,
+      //   ticket: body._id!,
+      //   title: "Appointment Reminder",
+      // };
+      // await createReminder(reminder, session, consumer.phone);
       return res.status(status).json(body);
     }
   }

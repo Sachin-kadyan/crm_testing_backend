@@ -33,7 +33,8 @@ export const createReplyPayload = (node: iReplyNode) => {
     },
   };
   if (node.headerLink && node.headerType) {
-    payload.interactive.header = createHeader(node.headerType, node.headerLink);
+    const type = node.headerType.toLowerCase() as any;
+    payload.interactive.header = createHeader(type, node.headerLink);
   }
   if (node.footer) {
     payload.interactive.footer = { text: node.footer };
