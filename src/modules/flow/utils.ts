@@ -173,7 +173,7 @@ export const createHeader = (type: "video" | "document" | "image", link: string)
     case "image":
       return {
         type: "image",
-        Image: {
+        image: {
           link,
         },
       };
