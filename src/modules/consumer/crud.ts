@@ -21,11 +21,15 @@ export const createConsumer = async (consumer: CONSUMER): Promise<CONSUMER> => {
   return consumer;
 };
 
-export const findOneConsumer = async (query: Object): Promise<WithId<CONSUMER> | null> => {
+export const findOneConsumer = async (
+  query: Object
+): Promise<WithId<CONSUMER> | null> => {
   return await MongoService.collection(CONSUMER_DB).findOne<CONSUMER>(query);
 };
 
 export const findConsumer = async (query: Object): Promise<CONSUMER[]> => {
-  const consumers = await MongoService.collection(CONSUMER_DB).find(query).toArray();
+  const consumers = await MongoService.collection(CONSUMER_DB)
+    .find<CONSUMER>(query)
+    .toArray();
   return consumers as CONSUMER[];
 };
