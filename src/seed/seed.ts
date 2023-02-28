@@ -1,6 +1,9 @@
 import { ObjectId } from "mongodb";
 import { createNodeIndexes } from "../modules/flow/functions";
-import { createSearchIndex, createUniqueServiceIndex } from "../modules/service/crud";
+import {
+  createSearchIndex,
+  createUniqueServiceIndex,
+} from "../modules/service/crud";
 import { createConsumerIndex } from "../modules/consumer/crud";
 import generateEstimate from "../modules/ticket/estimate/createEstimate";
 import firestore from "../services/firebase/firebase";
