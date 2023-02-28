@@ -5,7 +5,11 @@ import { v4 as uuid } from "uuid";
 const bucket = new S3();
 const BUCKET_NAME = process.env.BUCKET_NAME;
 
-export const putMedia = async (file: any, location: string, bucketName?: string) => {
+export const putMedia = async (
+  file: any,
+  location: string,
+  bucketName?: string
+) => {
   const fileName = uuid() + "-" + Date.now();
   const params: PutObjectRequest = {
     Bucket: `${bucketName ? bucketName : BUCKET_NAME}/${location}`,
@@ -26,7 +30,7 @@ export const getMedia = (filePath: string) => {
   const params = {
     Bucket: `${BUCKET_NAME}/${folderPath}`,
     Key: fileName,
-    Expires: 60 * 10,
+    Expires: 60 * 60,
   };
   return bucket.getSignedUrl("getObject", params);
 };
