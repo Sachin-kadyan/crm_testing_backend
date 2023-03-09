@@ -166,14 +166,6 @@ export const createTicket = PromiseWrapper(
       followUpDateOne.setMinutes(0o1);
       followUpDateOne.setDate(followUpDateOne.getDate());
 
-      // const filter = {};
-      // const options = { projection: { name: true, _id: false } };
-
-      // const doctors = await MongoService.collection("doctor")
-      //   .find(filter, options)
-      //   .toArray();
-      // console.log(doctors);
-
       cron.schedule(" 18 15 * * * ", function () {
         followUpMessage(
           consumer.firstName,
