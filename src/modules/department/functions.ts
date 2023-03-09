@@ -20,7 +20,9 @@ const checkParentExists = async (parent: ObjectId) => {
   if (!department) throw new ErrorHandler("Invalid Parent", 400);
 };
 
-export const createDepartmentHandler = async (department: iDepartment): Promise<FUNCTION_RESPONSE> => {
+export const createDepartmentHandler = async (
+  department: iDepartment
+): Promise<FUNCTION_RESPONSE> => {
   if (department.parent) {
     department.parent = new ObjectId(department.parent);
     await checkParentExists(department.parent);
@@ -39,7 +41,9 @@ export const getAllDepartments = async (parent?: boolean) => {
   return { status: 200, body: departments };
 };
 
-export const getDepartmentById = async (id: ObjectId): Promise<iDepartment | null> => {
+export const getDepartmentById = async (
+  id: ObjectId
+): Promise<iDepartment | null> => {
   return await findOneDepartment({ _id: id });
 };
 
@@ -47,11 +51,16 @@ export const getDepartmentById = async (id: ObjectId): Promise<iDepartment | nul
 
 export const doctorDepartmentValidation = async (departments: string[]) => {
   const { body } = await getAllDepartments(); // system departments
-  const check = departments.every((item) => body.some((dept) => dept._id?.toString() === item));
+  const check = departments.every((item) =>
+    body.some((dept) => dept._id?.toString() === item)
+  );
   if (!check) throw new ErrorHandler("Invalid department", 400);
 };
 
-export const createDoctorHandler = async (name: string, departments: string[]) => {
+export const createDoctorHandler = async (
+  name: string,
+  departments: string[]
+) => {
   await doctorDepartmentValidation(departments);
   const doctor = await insertOneDoctor({ name, departments });
   return { status: 200, body: doctor };
@@ -64,13 +73,14 @@ export const getDoctorsHandler = async (
   const departments = [];
   if (department) departments.push(department);
   if (subDepartment) departments.push(subDepartment);
-  const query = departments.length !== 0 ? { departments: { $in: departments } } : {};
+  const query =
+    departments.length !== 0 ? { departments: { $in: departments } } : {};
   const doctors = await findDoctor(query);
   return { status: 200, body: doctors };
 };
 
-export const findDoctorById = async (id: ObjectId) => {
-  return await findOneDoctor({ _id: id });
+export const findDoctorById = async (name: String) => {
+  return await findOneDoctor({ _id: name });
 };
 
 // tags
@@ -90,9 +100,13 @@ export const createWard = async (ward: iWard, session: ClientSession) => {
 };
 
 export const getAllWards = async () => {
-  return await MongoService.collection(Collections.WARD).find<iWard>({}).toArray();
+  return await MongoService.collection(Collections.WARD)
+    .find<iWard>({})
+    .toArray();
 };
 
 export const getWardById = async (id: ObjectId) => {
-  return await MongoService.collection(Collections.WARD).findOne<iWard>({ _id: id });
+  return await MongoService.collection(Collections.WARD).findOne<iWard>({
+    _id: id,
+  });
 };

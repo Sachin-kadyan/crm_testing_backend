@@ -60,3 +60,55 @@ export const sendTemplateMessage = async (
     throw new ErrorHandler(error.response.data.error.message, 500);
   }
 };
+
+export const followUpMessage = async (
+  patientName: string,
+  receiver: string,
+  templateName: string,
+  templateLanguage: string,
+  doctorName: string,
+  date: string
+) => {
+  try {
+    const templatePayload: any = {
+      messaging_product: "whatsapp",
+      recipient_type: "individual",
+      to: receiver,
+      type: "template",
+      template: {
+        name: templateName,
+        language: {
+          code: templateLanguage,
+        },
+        components: [
+          {
+            type: "body",
+            parameters: [
+              {
+                type: "text",
+                text: patientName,
+              },
+              {
+                type: "text",
+                text: doctorName,
+              },
+              {
+                type: "text",
+                text: date,
+              },
+            ],
+          },
+        ],
+      },
+    };
+    const { data } = await axios.post(WHATSAPP_URL, templatePayload, {
+      headers: {
+        Authorization: `Bearer ${WA_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return data;
+  } catch (error: any) {
+    throw new ErrorHandler(error.response.data.error.message, 500);
+  }
+};

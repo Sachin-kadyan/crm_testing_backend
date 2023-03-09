@@ -14,10 +14,10 @@ export interface iTicket {
 export interface iPrescription {
   consumer: ObjectId;
   departments: ObjectId[]; // remove sub department
-  doctor: ObjectId;
+  doctor: name;
   condition: string; //-
   symptoms: string; //-
-  followUp: string | number;
+  followUp: string;
   image: string;
   medicines: string[] | null; //-
   diagnostics: string[] | null;
