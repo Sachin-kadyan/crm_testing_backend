@@ -1,8 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 import { ClientSession, Collection, ObjectId } from "mongodb";
+
 import PromiseWrapper from "../../middleware/promiseWrapper";
 import { getMedia, putMedia } from "../../services/aws/s3";
 import {
+  findConsumerFromWAID,
+  saveMessage,
+} from "../../services/whatsapp/webhook";
+import {
+  followUpMessage,
   sendMessage,
   sendTemplateMessage,
 } from "../../services/whatsapp/whatsapp";
@@ -19,6 +25,7 @@ import {
 } from "../department/functions";
 import {
   findFlowConnectorByService,
+  sendTextMessage,
   startTemplateFlow,
 } from "../flow/functions";
 import { getSortedLeadCountRepresentatives } from "../representative/functions";
@@ -47,6 +54,7 @@ import {
   getTicketNotes,
   searchService,
 } from "./functions";
+const cron = require("node-cron");
 
 type ticketBody = iTicket & iPrescription;
 
@@ -139,27 +147,35 @@ export const createTicket = PromiseWrapper(
         ];
         await startTemplateFlow("flow", "en", consumer.phone, components);
       }
+      // const doctorDate = new Date(ticket.followUp);
+      // let doctorYear = doctorDate.getFullYear();
+      // let doctorMonth = doctorDate.getUTCMonth();
+      // let doctorDay = doctorDate.getDay();
+      // console.log(doctorDate, "hello");
+      // console.log(ticket.followUp.toString().split("T")[0], "newdatatbtbeb");
+      // console.log(doctorMonth);
+      // console.log(doctorDay);
+
+      // let doctorFollowUpDate = doctorDay + "-" + doctorMonth + "-" + doctorYear;
+      // console.log(doctorFollowUpDate);
+
       // const followUpDateOne = new Date(ticket.followUp);
-      // followUpDateOne.setHours(09);
-      // followUpDateOne.setMinutes(0);
-      // followUpDateOne.setDate(followUpDateOne.getDate() - 2);
-      // const reminder: iReminder = {
-      //   creator: req.user!._id,
-      //   date: followUpDateOne,
-      //   description: `Good morning Mr/Mrs/Ms  ${
-      //     consumer.firstName
-      //   }. Your wellbeing is important to us. This is a gentle reminder that you are due for an appointment with 🩺Dr ${
-      //     ticket.doctor
-      //   } on ${ticket.followUp.toString().split("T")[0]}. 🗓️
-      //   You are advised to bring all the previous prescriptions and lab reports, if any, as advised by your doctor.
-      //   ⏱️In case you wish to reschedule your appointment, please feel free to contact us on 07087105902.
-      //   🏥Paras Hospital cares for you. Looking forward to provide you with our best healthcare services.
-      //   Warm Regards
-      //   Paras Hospital, Panchkula`,
-      //   ticket: body._id!,
-      //   title: "Appointment Reminder",
-      // };
-      // await createReminder(reminder, session, consumer.phone);
+      // followUpDateOne.setHours(13);
+      // followUpDateOne.setMinutes(0o1);
+      // followUpDateOne.setDate(followUpDateOne.getDate());
+      // cron.schedule(" 15 12 * * * ", function () {
+      //   followUpMessage(
+      //     consumer.firstName,
+      //     consumer.phone,
+      //     "followup",
+      //     "en",
+      //     ticket.doctor.valueOf().toString(),
+      //     doctorDate
+      //   );
+
+      //   console.log("running a task every 15 seconds");
+      // });
+
       return res.status(status).json(body);
     }
   }
@@ -397,3 +413,7 @@ export const EstimateUploadAndSend = PromiseWrapper(
     return res.sendStatus(200);
   }
 );
+
+// export const folloUpDetails = PromiseWrapper(
+//   async (req: Request, res: Response, next: NextFunction) => {}
+// );

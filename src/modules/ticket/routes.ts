@@ -14,11 +14,24 @@ router
   .post(upload.single("image"), validations.create, controllers.createTicket)
   .get(isRepresentative, controllers.getRepresentativeTickets);
 router.route("/:consumerId").get(controllers.ticketsWithPrescription);
-router.route("/estimate").post(validations.createEstimate, controllers.createEstimateController);
-router.route("/estimate/:ticketId").get(validations.get_estimate, controllers.GetTicketEstimates);
+router
+  .route("/estimate")
+  .post(validations.createEstimate, controllers.createEstimateController);
+router
+  .route("/estimate/:ticketId")
+  .get(validations.get_estimate, controllers.GetTicketEstimates);
 router
   .route("/:ticketId/estimate/upload")
-  .post(upload.single("estimate"), validations.upload_estimate, controllers.EstimateUploadAndSend);
+  .post(
+    upload.single("estimate"),
+    validations.upload_estimate,
+    controllers.EstimateUploadAndSend
+  );
 router.route("/note").post(validations.create_note, controllers.CreateNote);
-router.route("/note/:ticketId").get(validations.get_notes, controllers.GetTicketNotes);
+router
+  .route("/note/:ticketId")
+  .get(validations.get_notes, controllers.GetTicketNotes);
+
+//follow up
+// router.route("/message").post(isLoggedIn, controllers.SendFollowUpMessage);
 export default router;

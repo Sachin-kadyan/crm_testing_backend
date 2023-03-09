@@ -8,6 +8,7 @@ import {
   saveMessageFromWebhook,
   saveTextMessage,
 } from "../../services/whatsapp/webhook";
+import { followUpMessage } from "../../services/whatsapp/whatsapp";
 import { iWebhookPayload } from "../../types/flow/webhook";
 import ErrorHandler from "../../utils/errorHandler";
 import { findConsumerById } from "../consumer/functions";
@@ -25,14 +26,24 @@ import {
 } from "./functions";
 
 export const createReplyNodeController = PromiseWrapper(
-  async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
+  async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+    session: ClientSession
+  ) => {
     const data = await createReplyNode(req.body, session);
     res.status(200).json(data);
   }
 );
 
 export const createListNodeController = PromiseWrapper(
-  async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
+  async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+    session: ClientSession
+  ) => {
     const data = await createListNode(req.body, session);
     res.status(200).json(data);
   }
@@ -41,7 +52,12 @@ export const createListNodeController = PromiseWrapper(
 // flow connector
 
 export const ConnectFlow = PromiseWrapper(
-  async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
+  async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+    session: ClientSession
+  ) => {
     const service = await findOneService({ _id: req.body.serviceId });
     if (service === null) throw new ErrorHandler("Invalid Service Id", 400);
     const connector = await connectFlow(req.body, session);
@@ -50,7 +66,11 @@ export const ConnectFlow = PromiseWrapper(
 );
 
 // webhook
-export const HandleWebhook = async (req: Request, res: Response, next: NextFunction) => {
+export const HandleWebhook = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const body: iWebhookPayload = req.body;
     //handling the responses
@@ -59,19 +79,23 @@ export const HandleWebhook = async (req: Request, res: Response, next: NextFunct
         changes.value.messages.forEach((message, mi) => {
           (async function () {
             try {
-              const { prescription, ticket } = await findTicketAndPrescriptionFromWAID(
-                changes.value.contacts[mi].wa_id
-              );
+              const { prescription, ticket } =
+                await findTicketAndPrescriptionFromWAID(
+                  changes.value.contacts[mi].wa_id
+                );
               const departmentSet = new Set([
                 "63ce58474dca242deb6a4d41",
                 "63ce59964dca242deb6a4d4c",
                 "63ce59314dca242deb6a4d48",
               ]);
               if (prescription && ticket && ticket?._id) {
-                if (!departmentSet.has(prescription?.departments[0].toString())) return;
+                if (!departmentSet.has(prescription?.departments[0].toString()))
+                  return;
                 if (message.button) {
                   await findAndSendNode(
-                    prescription.service ? prescription.service.toString() : "DF",
+                    prescription.service
+                      ? prescription.service.toString()
+                      : "DF",
                     changes.value.contacts[mi].wa_id,
                     ticket._id.toString()
                   );
@@ -86,7 +110,11 @@ export const HandleWebhook = async (req: Request, res: Response, next: NextFunct
                     ticket._id.toString()
                   );
                 }
-                await saveMessageFromWebhook(body, prescription.consumer.toString(), ticket._id.toString()); // saving message
+                await saveMessageFromWebhook(
+                  body,
+                  prescription.consumer.toString(),
+                  ticket._id.toString()
+                ); // saving message
               }
             } catch (error: any) {
               console.log(error.message);
@@ -102,7 +130,12 @@ export const HandleWebhook = async (req: Request, res: Response, next: NextFunct
 };
 
 export const SendMessage = PromiseWrapper(
-  async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
+  async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+    session: ClientSession
+  ) => {
     const { message, consumerId } = req.body;
     const consumer = await findConsumerById(consumerId);
     if (consumer === null) throw new ErrorHandler("Consumer Not Found", 400);
@@ -123,7 +156,12 @@ export const SendMessage = PromiseWrapper(
 );
 
 export const FindNode = PromiseWrapper(
-  async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
+  async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+    session: ClientSession
+  ) => {
     const { flowQuery } = req.query as unknown as { flowQuery: string };
     const node = await findNodeByDiseaseId(flowQuery);
     return res.status(200).json(node);
@@ -131,10 +169,21 @@ export const FindNode = PromiseWrapper(
 );
 
 export const GetConnector = PromiseWrapper(
-  async (req: Request, res: Response, next: NextFunction, session: ClientSession) => {
-    const { pageLength, page } = req.query as unknown as { pageLength: number; page: number };
-    if (pageLength > 50) throw new ErrorHandler("Page Length Limit Exceed", 400);
+  async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+    session: ClientSession
+  ) => {
+    const { pageLength, page } = req.query as unknown as {
+      pageLength: number;
+      page: number;
+    };
+    if (pageLength > 50)
+      throw new ErrorHandler("Page Length Limit Exceed", 400);
     const connectors = await getConnector(pageLength, page);
     return res.status(200).json(connectors);
   }
 );
+
+//follow up

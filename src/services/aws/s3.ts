@@ -30,7 +30,7 @@ export const getMedia = (filePath: string) => {
   const params = {
     Bucket: `${BUCKET_NAME}/${folderPath}`,
     Key: fileName,
-    Expires: 60 * 60,
+    Expires: 840 * 60,
   };
   return bucket.getSignedUrl("getObject", params);
 };
