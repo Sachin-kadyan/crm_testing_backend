@@ -37,31 +37,6 @@ app.get("/prod/", async (req: Request, res: Response) => {
 });
 
 app.use("/prod/api/v1/", moduleRoutes);
-// app.use("/cron", followUpMessage);
-
-// cron.schedule(" 05 * * * * * ", function () {
-//   followUpMessage("919452760854", "followup", "en");
-
-//   console.log("running a task every 15 seconds");
-// });
-
-// cron.schedule(" 42 10 * * *", async () => {
-//   const doctorId = new ObjectId("63f726edaa317c7daa4310e6");
-//   const doctor = await findDoctorById(doctorId);
-//   console.log(doctor);
-
-//   const query = { phone: "91945276854" };
-//   const consumer2 = await findOneConsumer(query);
-//   console.log(consumer2);
-
-//   console.log(consumer2?.phone);
-
-//   const ticketId = new ObjectId("63f729c2aa317c7daa4310ef");
-//   const ticket = await findTicketById(ticketId);
-//   console.log(ticket);
-
-//   console.log(ticket?.consumer);
-// });
 
 app.use(
   (err: ErrorHandler, req: Request, res: Response, next: NextFunction) => {
