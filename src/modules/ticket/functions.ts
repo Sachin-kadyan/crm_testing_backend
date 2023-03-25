@@ -2,11 +2,26 @@ import { ClientSession, Collection, ObjectId } from "mongodb";
 import { findConsumerFromWAID } from "../../services/whatsapp/webhook";
 import { FUNCTION_RESPONSE } from "../../types/api/api";
 import { CONSUMER } from "../../types/consumer/consumer";
-import { iEstimate, iNote, iPrescription, iTicket } from "../../types/ticket/ticket";
+import {
+  iEstimate,
+  ifollowUp,
+  iNote,
+  iPrescription,
+  iTicket,
+} from "../../types/ticket/ticket";
 import MongoService, { Collections } from "../../utils/mongo";
-import { createOnePrescription, createOneTicket, findServices, findTicket } from "./crud";
+import {
+  createOneFollowUp,
+  createOnePrescription,
+  createOneTicket,
+  findServices,
+  findTicket,
+} from "./crud";
 
-export const createTicketHandler = async (ticket: iTicket, session: ClientSession) => {
+export const createTicketHandler = async (
+  ticket: iTicket,
+  session: ClientSession
+) => {
   const createdTicket = await createOneTicket(ticket, session);
   return { status: 200, body: createdTicket };
 };
@@ -16,7 +31,9 @@ export const getAllTicketHandler = async () => {
 };
 
 export const getConsumerTickets = async (consumerId: ObjectId) => {
-  return await MongoService.collection(Collections.TICKET).find<iTicket>({ consumer: consumerId }).toArray();
+  return await MongoService.collection(Collections.TICKET)
+    .find<iTicket>({ consumer: consumerId })
+    .toArray();
 };
 
 export const getConsumerPrescriptions = async (consumerId: ObjectId) => {
@@ -25,8 +42,16 @@ export const getConsumerPrescriptions = async (consumerId: ObjectId) => {
     .toArray();
 };
 
-export const createPrescription = async (prescription: iPrescription, session: ClientSession) => {
+export const createPrescription = async (
+  prescription: iPrescription,
+  session: ClientSession
+) => {
   return await createOnePrescription(prescription, session);
+};
+
+///follow
+export const createFollowUp = async (followUp: ifollowUp) => {
+  return await createOneFollowUp(followUp);
 };
 
 export const searchService = async (
@@ -42,29 +67,47 @@ export const searchService = async (
 //prescription
 
 export const getPrescriptionById = async (id: ObjectId) => {
-  return await MongoService.collection(Collections.PRESCRIPTION).findOne<iPrescription>({ _id: id });
+  return await MongoService.collection(
+    Collections.PRESCRIPTION
+  ).findOne<iPrescription>({ _id: id });
 };
 
 export const findTicketAndPrescriptionFromWAID = async (waid: string) => {
-  const consumer = await MongoService.collection("consumer").find<CONSUMER>({ phone: waid }).toArray();
+  const consumer = await MongoService.collection("consumer")
+    .find<CONSUMER>({ phone: waid })
+    .toArray();
   const consumerIds = consumer.map((item) => item._id);
-  const query = consumer ? { consumer: { $in: consumerIds } } : { caregiver_phone: waid };
-  const prescription = await MongoService.collection(Collections.PRESCRIPTION).findOne<iPrescription>(query, {
+  const query = consumer
+    ? { consumer: { $in: consumerIds } }
+    : { caregiver_phone: waid };
+  const prescription = await MongoService.collection(
+    Collections.PRESCRIPTION
+  ).findOne<iPrescription>(query, {
     sort: { $natural: -1 },
   });
-  const ticket = await MongoService.collection(Collections.TICKET).findOne<iTicket>({
+  const ticket = await MongoService.collection(
+    Collections.TICKET
+  ).findOne<iTicket>({
     prescription: prescription?._id,
   });
   return { prescription, ticket };
 };
 
 //estimate
-export const createEstimate = async (estimate: iEstimate, session: ClientSession) => {
-  await MongoService.collection(Collections.ESTIMATE).insertOne(estimate, { session });
+export const createEstimate = async (
+  estimate: iEstimate,
+  session: ClientSession
+) => {
+  await MongoService.collection(Collections.ESTIMATE).insertOne(estimate, {
+    session,
+  });
   return estimate;
 };
 
-export const findEstimateById = async (estimateId: ObjectId, session?: ClientSession) => {
+export const findEstimateById = async (
+  estimateId: ObjectId,
+  session?: ClientSession
+) => {
   return await MongoService.collection(Collections.ESTIMATE).findOne<iEstimate>(
     { _id: estimateId },
     { session }
@@ -72,10 +115,16 @@ export const findEstimateById = async (estimateId: ObjectId, session?: ClientSes
 };
 
 export const getTicketEstimates = async (ticketId: ObjectId) => {
-  return await MongoService.collection(Collections.ESTIMATE).find<iEstimate>({ ticket: ticketId }).toArray();
+  return await MongoService.collection(Collections.ESTIMATE)
+    .find<iEstimate>({ ticket: ticketId })
+    .toArray();
 };
 
-export const updateEstimateTotal = async (estimateId: ObjectId, total: number, session?: ClientSession) => {
+export const updateEstimateTotal = async (
+  estimateId: ObjectId,
+  total: number,
+  session?: ClientSession
+) => {
   return await MongoService.collection(Collections.ESTIMATE).findOneAndUpdate(
     { _id: estimateId },
     { $set: { total } },
@@ -91,5 +140,7 @@ export const createNote = async (note: iNote, session: ClientSession) => {
 };
 
 export const getTicketNotes = async (ticketId: ObjectId) => {
-  return await MongoService.collection(Collections.Note).find<iNote>({ ticket: ticketId }).toArray();
+  return await MongoService.collection(Collections.Note)
+    .find<iNote>({ ticket: ticketId })
+    .toArray();
 };
