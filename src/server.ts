@@ -50,7 +50,7 @@ let todayDate = new Date()
 console.log("guugkj");
 
 //follow up Messages
-cron.schedule(" 01 09 * * *", () => {
+cron.schedule(" 30 14 * * *", () => {
   try {
     MongoService.collection("followUp")
       .find({})
