@@ -111,6 +111,6 @@ export const followUpMessage = async (
   } catch (error: any) {
     // throw new ErrorHandler("Error From Whatsapp", 500);
     // console.log(error);
-    console.log(error.response.data);
+    console.log("Error Format");
   }
 };
