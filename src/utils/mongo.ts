@@ -17,6 +17,7 @@ export const Collections = {
   SCRIPT: "script",
   REMINDER: "reminder",
   TODO: "todo",
+  FOLLOWUP: "followup",
 };
 
 abstract class MongoService {
@@ -41,5 +42,10 @@ abstract class MongoService {
 export const getCreateDate = (id: ObjectId) => {
   return id.getTimestamp();
 };
+// export const getCreateDatePlusOne3 = (id: ObjectId) => {
+//   const createDate = id.getTimestamp();
+//   createDate.setDate(createDate.getDate());
+//   return createDate;
+// };
 
 export default MongoService;

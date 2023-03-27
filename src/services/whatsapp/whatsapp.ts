@@ -67,7 +67,7 @@ export const followUpMessage = async (
   templateName: string,
   templateLanguage: string,
   doctorName: string,
-  date: Date
+  date: string
 ) => {
   try {
     const templatePayload: any = {
@@ -109,6 +109,8 @@ export const followUpMessage = async (
     });
     return data;
   } catch (error: any) {
-    throw new ErrorHandler(error.response.data.error.message, 500);
+    // throw new ErrorHandler("Error From Whatsapp", 500);
+    // console.log(error);
+    console.log(error.response.data);
   }
 };

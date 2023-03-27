@@ -9,15 +9,16 @@ export interface iTicket {
   assigned: ObjectId;
   value?: number;
   highlights?: string[];
+  date: Date;
 }
 
 export interface iPrescription {
   consumer: ObjectId;
   departments: ObjectId[]; // remove sub department
-  doctor: ObjectId;
+  doctor: name;
   condition: string; //-
   symptoms: string; //-
-  followUp: string | number;
+  followUp: Date;
   image: string;
   medicines: string[] | null; //-
   diagnostics: string[] | null;
@@ -26,6 +27,7 @@ export interface iPrescription {
   _id?: ObjectId;
   caregiver_name?: string;
   caregiver_phone?: string;
+  created_Date: Date | number | string;
   // care giver
 }
 
@@ -62,4 +64,16 @@ export interface iNote {
   ticket: ObjectId;
   creator: ObjectId;
   createdAt: string | number;
+}
+
+export interface ifollowUp {
+  id?: ObjectId;
+  name: string;
+  followUpDate: Date | string | number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  followUpDate1: Date | string | number;
+  followUpDate2: Date | string | number;
 }

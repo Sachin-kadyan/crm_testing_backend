@@ -8,13 +8,14 @@ import { FUNCTION_RESPONSE } from "../../types/api/api";
 import { CONSUMER } from "../../types/consumer/consumer";
 import {
   iEstimate,
+  ifollowUp,
   iNote,
   iPrescription,
   iTicket,
 } from "../../types/ticket/ticket";
 import MongoService, { Collections } from "../../utils/mongo";
-import { createTextPayload } from "../flow/utils";
 import {
+  createOneFollowUp,
   createOnePrescription,
   createOneTicket,
   findServices,
@@ -50,6 +51,11 @@ export const createPrescription = async (
   session: ClientSession
 ) => {
   return await createOnePrescription(prescription, session);
+};
+
+///follow
+export const createFollowUp = async (followUp: ifollowUp) => {
+  return await createOneFollowUp(followUp);
 };
 
 export const searchService = async (

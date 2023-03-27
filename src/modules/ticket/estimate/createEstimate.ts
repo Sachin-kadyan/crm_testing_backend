@@ -96,6 +96,7 @@ const generateEstimate = async (estimateId: ObjectId, session: ClientSession) =>
                   (estimate.additionalAmount ? estimate.additionalAmount : 0)
               );
             });
+            
           const document = new PDFDocument();
           let buffers: any = [];
           document.on("data", buffers.push.bind(buffers));

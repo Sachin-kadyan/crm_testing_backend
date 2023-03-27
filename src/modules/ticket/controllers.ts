@@ -13,7 +13,12 @@ import {
   sendTemplateMessage,
 } from "../../services/whatsapp/whatsapp";
 import { iReminder } from "../../types/task/task";
-import { iEstimate, iPrescription, iTicket } from "../../types/ticket/ticket";
+import {
+  iEstimate,
+  ifollowUp,
+  iPrescription,
+  iTicket,
+} from "../../types/ticket/ticket";
 import ErrorHandler from "../../utils/errorHandler";
 import MongoService, { Collections, getCreateDate } from "../../utils/mongo";
 import { findConsumer } from "../consumer/crud";
@@ -34,6 +39,7 @@ import { getServiceById } from "../service/functions";
 import { findStageByCode } from "../stages/functions";
 import { createReminder } from "../task/functions";
 import {
+  createOneFollowUp,
   createOnePrescription,
   findPrescription,
   findPrescriptionById,
@@ -54,9 +60,12 @@ import {
   getTicketNotes,
   searchService,
 } from "./functions";
+import Schedule from "node-schedule";
+import { CONSUMER } from "../../types/consumer/consumer";
 const cron = require("node-cron");
 
 type ticketBody = iTicket & iPrescription;
+type tickeFollow = ifollowUp & iPrescription & iTicket & CONSUMER;
 
 export const createTicket = PromiseWrapper(
   async (
@@ -105,13 +114,21 @@ export const createTicket = PromiseWrapper(
         medicines: ticket.medicines ? JSON.parse(req.body.medicines) : null,
         doctor: ticket.doctor,
         followUp: ticket.followUp,
+
         image: Key,
         symptoms: ticket.symptoms,
         caregiver_name: ticket.caregiver_name,
         caregiver_phone: ticket.caregiver_phone,
+        created_Date: new Date()
+          .toLocaleString("en-IN", {
+            timeZone: "Asia/Kolkata",
+          })
+          .split(",")[0],
+        // followup db data push
       },
       session
     );
+
     // finally create ticket
     if (!_id) {
       new ErrorHandler("failed to create prescription", 400);
@@ -127,6 +144,7 @@ export const createTicket = PromiseWrapper(
           creator: new ObjectId(req.user!._id),
           assigned: representatives[0]._id,
           stage: stage._id!,
+          date: new Date(),
         },
         session
       );
@@ -147,34 +165,21 @@ export const createTicket = PromiseWrapper(
         ];
         await startTemplateFlow("flow", "en", consumer.phone, components);
       }
-      // const doctorDate = new Date(ticket.followUp);
-      // let doctorYear = doctorDate.getFullYear();
-      // let doctorMonth = doctorDate.getUTCMonth();
-      // let doctorDay = doctorDate.getDay();
-      // console.log(doctorDate, "hello");
-      // console.log(ticket.followUp.toString().split("T")[0], "newdatatbtbeb");
-      // console.log(doctorMonth);
-      // console.log(doctorDay);
 
-      // let doctorFollowUpDate = doctorDay + "-" + doctorMonth + "-" + doctorYear;
-      // console.log(doctorFollowUpDate);
-
-      // const followUpDateOne = new Date(ticket.followUp);
-      // followUpDateOne.setHours(13);
-      // followUpDateOne.setMinutes(0o1);
-      // followUpDateOne.setDate(followUpDateOne.getDate());
-      // cron.schedule(" 15 12 * * * ", function () {
-      //   followUpMessage(
-      //     consumer.firstName,
-      //     consumer.phone,
-      //     "followup",
-      //     "en",
-      //     ticket.doctor.valueOf().toString(),
-      //     doctorDate
-      //   );
-
-      //   console.log("running a task every 15 seconds");
-      // });
+      await createOneFollowUp({
+        firstName: consumer.firstName,
+        name: doctor.name,
+        phone: consumer.phone,
+        followUpDate: new Date(ticket.followUp.getTime()).toISOString(),
+        lastName: consumer.lastName,
+        email: "",
+        followUpDate1: new Date(
+          ticket.followUp.getTime() - 1 * 24 * 60 * 60 * 1000
+        ).toISOString(),
+        followUpDate2: new Date(
+          ticket.followUp.getTime() - 2 * 24 * 60 * 60 * 1000
+        ).toISOString(),
+      });
 
       return res.status(status).json(body);
     }
@@ -284,6 +289,7 @@ export const getRepresentativeTickets = PromiseWrapper(
         },
       ])
       .toArray();
+
     for await (const ticket of tickets) {
       ticket.prescription[0].image = getMedia(ticket.prescription[0].image);
       if (ticket.prescription[0].service) {
@@ -298,6 +304,7 @@ export const getRepresentativeTickets = PromiseWrapper(
       ticket.prescription[0].createdAt = getCreateDate(
         ticket.prescription[0]._id
       );
+
       if (ticket.estimate[0]) {
         const service = await findOneService({
           _id: ticket.estimate[0].service[0].id,
@@ -414,6 +421,10 @@ export const EstimateUploadAndSend = PromiseWrapper(
   }
 );
 
-// export const folloUpDetails = PromiseWrapper(
-//   async (req: Request, res: Response, next: NextFunction) => {}
-// );
+function capitalizeFirstLetter(part: string): any {
+  throw new Error("Function not implemented.");
+}
+
+function capitalizeName(name: any): any {
+  throw new Error("Function not implemented.");
+}

@@ -9,13 +9,8 @@ import ErrorHandler from "./utils/errorHandler";
 import MongoService, { Collections } from "./utils/mongo";
 import seed from "./seed/seed";
 import { followUpMessage } from "./services/whatsapp/whatsapp";
-import { ObjectId } from "mongodb";
-import { iPrescription } from "./types/ticket/ticket";
-import { findDoctorById } from "./modules/department/functions";
-import { findOneConsumer } from "./modules/consumer/crud";
-import { findTicketById } from "./modules/ticket/crud";
 
-// const cron = require("node-cron");
+const cron = require("node-cron");
 
 declare global {
   namespace Express {
@@ -46,6 +41,66 @@ app.use(
     return res.status(status).json({ message: message });
   }
 );
+let todayDate = new Date()
+  .toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
+  })
+  .split(",")[0];
+
+//follow up Messages
+cron.schedule(" 10 22 * * *", () => {
+  try {
+    MongoService.collection("followUp")
+      .find({})
+      .forEach((val) => {
+        function capitalizeFirstLetter(str: string): string {
+          return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+        function capitalizeName(name: string): string {
+          const parts = name.split(".");
+          const capitalizedParts = parts.map((part) =>
+            capitalizeFirstLetter(part)
+          );
+          return capitalizedParts.join(".");
+        }
+
+        let twoDaysBeforeFormat = new Date(val.followUpDate2)
+          .toLocaleString("en-IN", {
+            timeZone: "Asia/Kolkata",
+          })
+          .split(",")[0];
+        let oneDayBeforeFormat = new Date(val.followUpDate1)
+          .toLocaleString("en-IN", {
+            timeZone: "Asia/Kolkata",
+          })
+          .split(",")[0];
+        const doctorDate = new Date(val.followUpDate)
+          .toLocaleString("en-IN", {
+            timeZone: "Asia/Kolkata",
+          })
+          .split(",")[0];
+
+        if (
+          todayDate === oneDayBeforeFormat ||
+          twoDaysBeforeFormat === todayDate ||
+          todayDate === doctorDate
+        ) {
+          followUpMessage(
+            val.firstName.charAt(0).toUpperCase() + val.firstName.slice(1),
+            val.phone,
+            "followup",
+            "en",
+            capitalizeName(val.name),
+            doctorDate
+          );
+
+          console.log("two days before");
+        }
+      });
+  } catch (error) {
+    console.log(error);
+  }
+});
 
 MongoService.init().then(() => {
   app.listen(PORT, async () => {

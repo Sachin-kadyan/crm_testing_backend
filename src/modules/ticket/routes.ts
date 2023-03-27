@@ -2,6 +2,8 @@ import { Router } from "express";
 import multer from "multer";
 import { isRepresentative } from "../../middleware/authorization/isAdmin";
 import isLoggedIn from "../../middleware/authorization/isLoggedIn";
+import { CONSUMER } from "../../types/consumer/consumer";
+import MongoService from "../../utils/mongo";
 import * as controllers from "./controllers";
 import * as validations from "./validations";
 
@@ -31,7 +33,11 @@ router.route("/note").post(validations.create_note, controllers.CreateNote);
 router
   .route("/note/:ticketId")
   .get(validations.get_notes, controllers.GetTicketNotes);
-
-//follow up
-// router.route("/message").post(isLoggedIn, controllers.SendFollowUpMessage);
+// router.route("/search/:key").get(async (req, resp) => {
+//   const query = { firstName: { $regex: /name-to-search/i } };
+//   const consumers = await MongoService.collection("consumer")
+//     .find<CONSUMER>(query)
+//     .toArray();
+//   return consumers;
+// });
 export default router;
