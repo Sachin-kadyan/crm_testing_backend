@@ -170,14 +170,15 @@ export const createTicket = PromiseWrapper(
         firstName: consumer.firstName,
         name: doctor.name,
         phone: consumer.phone,
-        followUpDate: new Date(ticket.followUp.getTime()).toISOString(),
+        followUpDate: new Date(ticket.followUp).toISOString(),
         lastName: consumer.lastName,
         email: "",
         followUpDate1: new Date(
-          ticket.followUp.getTime() - 1 * 24 * 60 * 60 * 1000
+          ticket.followUp.getDate() - 1 * 24 * 60 * 60 * 1000
         ).toISOString(),
+
         followUpDate2: new Date(
-          ticket.followUp.getTime() - 2 * 24 * 60 * 60 * 1000
+          ticket.followUp.getDate() - 2 * 24 * 60 * 60 * 1000
         ).toISOString(),
       });
 
