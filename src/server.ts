@@ -48,7 +48,7 @@ let todayDate = new Date()
   .split(",")[0];
 
 //follow up Messages
-cron.schedule(" 55 23 * * *", () => {
+cron.schedule(" 30 04 * * *", () => {
   try {
     MongoService.collection("followUp")
       .find({})
