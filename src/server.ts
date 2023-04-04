@@ -43,7 +43,7 @@ app.use(
 );
 
 //follow up Messages
-cron.schedule(" 00 07 * * *", () => {
+cron.schedule(" 30 04 * * *", () => {
   let todayDate = new Date()
     .toLocaleString("en-IN", {
       timeZone: "Asia/Kolkata",
