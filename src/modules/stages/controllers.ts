@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import PromiseWrapper from "../../middleware/promiseWrapper";
-import { createStageHandler, getAllStagesHandler, searchConsumer } from "./functions";
+import { createStageHandler, getAllStagesHandler, getAllSubStagesHandler, searchConsumer } from "./functions";
 
 export const createStage = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -22,3 +22,10 @@ export const getAllStages = PromiseWrapper(
   }
 );
 
+
+export const getAllSubStages = PromiseWrapper(
+  async (req: Request, res: Response) => {
+    const subStages = await getAllSubStagesHandler();
+    return res.status(200).json(subStages);
+  }
+);

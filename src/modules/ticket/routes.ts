@@ -6,6 +6,7 @@ import { CONSUMER } from "../../types/consumer/consumer";
 import MongoService from "../../utils/mongo";
 import * as controllers from "./controllers";
 import * as validations from "./validations";
+import { updateSubStage } from "./functions";
 
 const upload = multer();
 
@@ -16,6 +17,7 @@ router
   .post(upload.single("image"), validations.create, controllers.createTicket)
   .get(isRepresentative, controllers.getRepresentativeTickets);
 router.route("/:consumerId").get(controllers.ticketsWithPrescription);
+router.route("/ticketUpdate").put(controllers.updateTicketData)
 router
   .route("/estimate")
   .post(validations.createEstimate, controllers.createEstimateController);
