@@ -243,6 +243,8 @@ export const ticketsWithPrescription = PromiseWrapper(
 
 export const getRepresentativeTickets = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
+    console.log("query: ", req.query.name)
+    const query: any[] = req.query?.name !== "undefined" ? [req.query.name] : []
     const tickets = await MongoService.collection(Collections.TICKET)
       .aggregate([
         {
@@ -256,6 +258,17 @@ export const getRepresentativeTickets = PromiseWrapper(
               { $limit: 1 },
             ],
             as: "consumer",
+          },
+        },
+        {
+          $match: {
+            $or:  query.length > 0 ?[
+              {
+                "consumer.firstName": {
+                  $all: query,
+                },
+              }
+            ] : [{}],
           },
         },
         {
