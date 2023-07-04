@@ -243,9 +243,15 @@ export const ticketsWithPrescription = PromiseWrapper(
 
 export const getRepresentativeTickets = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log("query: ", req.query.name)
-    const query: any[] = req.query?.name !== "undefined" ? [req.query.name] : []
-    const tickets = await MongoService.collection(Collections.TICKET)
+    const download = req.query.downloadAll;
+    const pageNum: any = req.query?.page || 0;
+    const skipCount = download!=="true" ? (parseInt(pageNum) - 1) * 10 : 0;
+    const limitCount = download!=="true" ? 10 : Math.pow(10, 10); //  highest number 
+    console.log("query: ", req.query.name, req.query.page, download);
+    const query: any[] =
+      req.query?.name !== "undefined" ? [req.query.name] : [];
+        
+    let tickets: any = await MongoService.collection(Collections.TICKET)
       .aggregate([
         {
           $lookup: {
@@ -262,13 +268,26 @@ export const getRepresentativeTickets = PromiseWrapper(
         },
         {
           $match: {
-            $or:  query.length > 0 ?[
-              {
-                "consumer.firstName": {
-                  $all: query,
-                },
-              }
-            ] : [{}],
+            $or:
+              query.length > 0
+                ? [
+                    {
+                      "consumer.firstName": {
+                        $all: query,
+                      },
+                    },
+                    {
+                      "consumer.lastName": {
+                        $all: query,
+                      },
+                    },
+                    {
+                      "consumer.phone": {
+                        $all: query,
+                      },
+                    },
+                  ]
+                : [{}],
           },
         },
         {
@@ -310,10 +329,18 @@ export const getRepresentativeTickets = PromiseWrapper(
             as: "creator",
           },
         },
+
+      {
+          $facet: {
+            count: [{ $count: "totalCount" }],
+            data: [{ $skip: skipCount }, { $limit: limitCount }],
+          },
+        },
       ])
       .toArray();
 
-    for await (const ticket of tickets) {
+
+    for await (const ticket of tickets[0].data) {
       ticket.prescription[0].image = getMedia(ticket.prescription[0].image);
       if (ticket.prescription[0].service) {
         const presService = await getServiceById(
@@ -330,7 +357,7 @@ export const getRepresentativeTickets = PromiseWrapper(
 
       if (ticket.estimate[0]) {
         const service = await findOneService({
-          _id: ticket.estimate[0].service[0].id,
+          _id: ticket.estimate[0].service[0]?._id,
         });
         ticket.estimate[0].service[0] = {
           ...ticket.estimate[0].service[0],
@@ -339,7 +366,13 @@ export const getRepresentativeTickets = PromiseWrapper(
         ticket.estimate[0].createdAt = getCreateDate(ticket.estimate[0]._id);
       }
     }
-    return res.status(200).json(tickets);
+
+    return res
+      .status(200)
+      .json({
+        tickets: tickets[0]?.data,
+        count: tickets[0]?.count[0]?.totalCount || 0,
+      });
   }
 );
 
@@ -379,7 +412,6 @@ export const createEstimateController = PromiseWrapper(
 
     const ticketData: iTicket | null = await findOneTicket(estimateBody.ticket);
 
-
     if (ticketData !== null) {
       if (ticketData?.subStageCode.code < 2) {
         const result = await updateSubStage(
@@ -390,7 +422,6 @@ export const createEstimateController = PromiseWrapper(
           },
           session
         ); //update estimation substage
-
       }
     } else {
       throw new ErrorHandler("couldn't find ticket Id", 400);
@@ -426,8 +457,6 @@ export const CreateNote = PromiseWrapper(
     const note = await createNote(noteBody, session); //update estimation substage
 
     const ticketData: iTicket | null = await findOneTicket(noteBody.ticket);
-
-   
 
     if (ticketData !== null) {
       if (
@@ -468,7 +497,6 @@ export const updateTicketData = PromiseWrapper(
         session
       ); //update next ticket stage
       res.status(200).json("Stage updated!");
-     
     } catch (e) {
       res.status(500).json({ status: 500, error: e });
     }
