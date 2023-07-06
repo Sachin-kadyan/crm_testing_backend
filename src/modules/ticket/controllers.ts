@@ -153,6 +153,7 @@ export const createTicket = PromiseWrapper(
             active: !!engagementConfirm,
             code: 1,
           },
+          modifiedDate: null,
         },
         session
       );
@@ -245,12 +246,13 @@ export const getRepresentativeTickets = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
     const download = req.query.downloadAll;
     const pageNum: any = req.query?.page || 0;
-    const skipCount = download!=="true" ? (parseInt(pageNum) - 1) * 10 : 0;
-    const limitCount = download!=="true" ? 10 : Math.pow(10, 10); //  highest number 
+    const skipCount = download !== "true" ? (parseInt(pageNum) - 1) * 10 : 0;
+    const limitCount = download !== "true" ? 10 : Math.pow(10, 10); //  highest number
+    const threeDaysOldTime = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
     console.log("query: ", req.query.name, req.query.page, download);
     const query: any[] =
       req.query?.name !== "undefined" ? [req.query.name] : [];
-        
+
     let tickets: any = await MongoService.collection(Collections.TICKET)
       .aggregate([
         {
@@ -287,7 +289,16 @@ export const getRepresentativeTickets = PromiseWrapper(
                       },
                     },
                   ]
-                : [{}],
+                : [
+                    {
+                      modifiedDate: {
+                        $lte: threeDaysOldTime,
+                      },                      
+                    },
+                    {
+                      modifiedDate: null
+                    },
+                  ],
           },
         },
         {
@@ -330,7 +341,7 @@ export const getRepresentativeTickets = PromiseWrapper(
           },
         },
 
-      {
+        {
           $facet: {
             count: [{ $count: "totalCount" }],
             data: [{ $skip: skipCount }, { $limit: limitCount }],
@@ -338,7 +349,6 @@ export const getRepresentativeTickets = PromiseWrapper(
         },
       ])
       .toArray();
-
 
     for await (const ticket of tickets[0].data) {
       ticket.prescription[0].image = getMedia(ticket.prescription[0].image);
@@ -367,12 +377,10 @@ export const getRepresentativeTickets = PromiseWrapper(
       }
     }
 
-    return res
-      .status(200)
-      .json({
-        tickets: tickets[0]?.data,
-        count: tickets[0]?.count[0]?.totalCount || 0,
-      });
+    return res.status(200).json({
+      tickets: tickets[0]?.data,
+      count: tickets[0]?.count[0]?.totalCount || 0,
+    });
   }
 );
 
@@ -493,10 +501,11 @@ export const updateTicketData = PromiseWrapper(
         {
           stage: stage._id!,
           subStageCode: req.body.subStageCode,
+          modifiedDate: new Date(),
         },
         session
       ); //update next ticket stage
-      res.status(200).json("Stage updated!");
+      res.status(200).json(`Stage updated to ${stage.name}!`);
     } catch (e) {
       res.status(500).json({ status: 500, error: e });
     }
