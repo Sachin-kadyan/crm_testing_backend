@@ -519,6 +519,28 @@ export const updateTicketData = PromiseWrapper(
   }
 );
 
+
+export const updateTicketSubStageCode = PromiseWrapper(
+  async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+    session: ClientSession
+  ) => {
+    try {
+      let ticketId = req.body?.ticket;
+      ticketId = new ObjectId(ticketId);
+      const subStageCode = req.body?.subStageCode;
+      const result = await updateSubStage(ticketId, subStageCode, session)
+      res.status(200).json({message :`SubStage updated!`, result});
+    }
+    catch(e){
+      res.status(500).json({ status: 500, error: e });
+  }
+  }
+)
+    
+
 export const GetTicketNotes = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
     const notes = await getTicketNotes(new ObjectId(req.params.ticketId));
