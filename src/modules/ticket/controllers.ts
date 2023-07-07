@@ -248,7 +248,12 @@ export const getRepresentativeTickets = PromiseWrapper(
     const pageNum: any = req.query?.page || 0;
     const skipCount = download !== "true" ? (parseInt(pageNum) - 1) * 10 : 0;
     const limitCount = download !== "true" ? 10 : Math.pow(10, 10); //  highest number
-    const threeDaysOldTime = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+
+    const dateAfterThreeDays = new Date();
+    dateAfterThreeDays.setDate(dateAfterThreeDays.getDate() + 3); // Added 3 days to today's date
+    const dateAfterFortyFiveDays = new Date();
+    dateAfterFortyFiveDays.setDate(dateAfterFortyFiveDays.getDate() + 45); // Added 45 days to today's date
+    
     console.log("query: ", req.query.name, req.query.page, download);
     const query: any[] =
       req.query?.name !== "undefined" ? [req.query.name] : [];
@@ -292,11 +297,13 @@ export const getRepresentativeTickets = PromiseWrapper(
                 : [
                     {
                       modifiedDate: {
-                        $lte: threeDaysOldTime,
-                      },                      
+                        $gt: dateAfterThreeDays,
+
+                        $lt: dateAfterFortyFiveDays,
+                      },
                     },
                     {
-                      modifiedDate: null
+                      modifiedDate: null,
                     },
                   ],
           },
@@ -511,6 +518,28 @@ export const updateTicketData = PromiseWrapper(
     }
   }
 );
+
+
+export const updateTicketSubStageCode = PromiseWrapper(
+  async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+    session: ClientSession
+  ) => {
+    try {
+      let ticketId = req.body?.ticket;
+      ticketId = new ObjectId(ticketId);
+      const subStageCode = req.body?.subStageCode;
+      const result = await updateSubStage(ticketId, subStageCode, session)
+      res.status(200).json({message :`SubStage updated!`, result});
+    }
+    catch(e){
+      res.status(500).json({ status: 500, error: e });
+  }
+  }
+)
+    
 
 export const GetTicketNotes = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction) => {

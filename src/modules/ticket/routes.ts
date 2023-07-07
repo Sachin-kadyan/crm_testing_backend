@@ -18,6 +18,7 @@ router
   .get(isRepresentative, controllers.getRepresentativeTickets);
 router.route("/:consumerId").get(controllers.ticketsWithPrescription);
 router.route("/ticketUpdate").put(controllers.updateTicketData)
+router.route("/subStageUpdate").put(controllers.updateTicketSubStageCode)
 router
   .route("/estimate")
   .post(validations.createEstimate, controllers.createEstimateController);
