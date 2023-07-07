@@ -347,6 +347,12 @@ export const getRepresentativeTickets = PromiseWrapper(
             as: "creator",
           },
         },
+        
+          {
+            $sort: {
+              _id: -1
+            }
+        },
 
         {
           $facet: {
