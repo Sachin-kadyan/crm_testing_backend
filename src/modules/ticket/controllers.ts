@@ -70,6 +70,8 @@ const cron = require("node-cron");
 type ticketBody = iTicket & iPrescription;
 type tickeFollow = ifollowUp & iPrescription & iTicket & CONSUMER;
 
+export const UNDEFINED = "undefined" 
+
 export const createTicket = PromiseWrapper(
   async (
     req: Request,
@@ -244,19 +246,35 @@ export const ticketsWithPrescription = PromiseWrapper(
 
 export const getRepresentativeTickets = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
-    const download = req.query.downloadAll;
-    const pageNum: any = req.query?.page || 0;
+    const requestQuery: any = req.query;
+    const download = requestQuery.downloadAll;
+    const pageNum: any = requestQuery?.page || 0;
     const skipCount = download !== "true" ? (parseInt(pageNum) - 1) * 10 : 0;
     const limitCount = download !== "true" ? 10 : Math.pow(10, 10); //  highest number
+    const stageList = requestQuery.stageList
+      ? requestQuery?.stageList?.split(",").map((id : string)=>new ObjectId(id) )
+      : [];
+    const representative = requestQuery?.representative;
+    let filters = {};
+
+    if (stageList?.length > 0) {
+      filters = { ...filters, stage: { $in: stageList } };
+    }
+
+    console.log("stagelist =>", stageList, typeof representative, representative==="null")
+
+    if (representative !== undefined && representative !== "null") {
+      filters = { ...filters, creator: new ObjectId(representative) };
+    }
 
     const dateAfterThreeDays = new Date();
-    dateAfterThreeDays.setDate(dateAfterThreeDays.getDate() + 3); // Added 3 days to today's date
+    dateAfterThreeDays.setDate(dateAfterThreeDays.getDate() + 2); // Added 3 days to today's date
     const dateAfterFortyFiveDays = new Date();
-    dateAfterFortyFiveDays.setDate(dateAfterFortyFiveDays.getDate() + 45); // Added 45 days to today's date
-    
-    console.log("query: ", req.query.name, req.query.page, download);
-    const query: any[] =
-      req.query?.name !== "undefined" ? [req.query.name] : [];
+    dateAfterFortyFiveDays.setDate(dateAfterFortyFiveDays.getDate() + 44); // Added 45 days to today's date
+
+    console.log("query: ", requestQuery, requestQuery.stageList, filters);
+    const searchQry: any[] =
+      requestQuery?.name !== UNDEFINED ? [requestQuery.name] : [];
 
     let tickets: any = await MongoService.collection(Collections.TICKET)
       .aggregate([
@@ -276,21 +294,21 @@ export const getRepresentativeTickets = PromiseWrapper(
         {
           $match: {
             $or:
-              query.length > 0
+              searchQry.length > 0
                 ? [
                     {
                       "consumer.firstName": {
-                        $all: query,
+                        $all: searchQry,
                       },
                     },
                     {
                       "consumer.lastName": {
-                        $all: query,
+                        $all: searchQry,
                       },
                     },
                     {
                       "consumer.phone": {
-                        $all: query,
+                        $all: searchQry,
                       },
                     },
                   ]
@@ -307,6 +325,9 @@ export const getRepresentativeTickets = PromiseWrapper(
                     },
                   ],
           },
+        },
+        {
+          $match: filters,
         },
         {
           $lookup: {
@@ -347,11 +368,11 @@ export const getRepresentativeTickets = PromiseWrapper(
             as: "creator",
           },
         },
-        
-          {
-            $sort: {
-              _id: -1
-            }
+
+        {
+          $sort: {
+            _id: -1,
+          },
         },
 
         {
@@ -525,7 +546,6 @@ export const updateTicketData = PromiseWrapper(
   }
 );
 
-
 export const updateTicketSubStageCode = PromiseWrapper(
   async (
     req: Request,
@@ -537,15 +557,13 @@ export const updateTicketSubStageCode = PromiseWrapper(
       let ticketId = req.body?.ticket;
       ticketId = new ObjectId(ticketId);
       const subStageCode = req.body?.subStageCode;
-      const result = await updateSubStage(ticketId, subStageCode, session)
-      res.status(200).json({message :`SubStage updated!`, result});
-    }
-    catch(e){
+      const result = await updateSubStage(ticketId, subStageCode, session);
+      res.status(200).json({ message: `SubStage updated!`, result });
+    } catch (e) {
       res.status(500).json({ status: 500, error: e });
+    }
   }
-  }
-)
-    
+);
 
 export const GetTicketNotes = PromiseWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
