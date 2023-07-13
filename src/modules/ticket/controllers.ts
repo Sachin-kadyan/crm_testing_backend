@@ -70,7 +70,7 @@ const cron = require("node-cron");
 type ticketBody = iTicket & iPrescription;
 type tickeFollow = ifollowUp & iPrescription & iTicket & CONSUMER;
 
-export const UNDEFINED = "undefined" 
+export const UNDEFINED = "undefined";
 
 export const createTicket = PromiseWrapper(
   async (
@@ -252,7 +252,9 @@ export const getRepresentativeTickets = PromiseWrapper(
     const skipCount = download !== "true" ? (parseInt(pageNum) - 1) * 10 : 0;
     const limitCount = download !== "true" ? 10 : Math.pow(10, 10); //  highest number
     const stageList = requestQuery.stageList
-      ? requestQuery?.stageList?.split(",").map((id : string)=>new ObjectId(id) )
+      ? requestQuery?.stageList
+          ?.split(",")
+          .map((id: string) => new ObjectId(id))
       : [];
     const representative = requestQuery?.representative;
     let filters = {};
@@ -261,16 +263,23 @@ export const getRepresentativeTickets = PromiseWrapper(
       filters = { ...filters, stage: { $in: stageList } };
     }
 
-    console.log("stagelist =>", stageList, typeof representative, representative==="null")
+    console.log(
+      "stagelist =>",
+      stageList,
+      typeof representative,
+      representative === "null"
+    );
 
     if (representative !== undefined && representative !== "null") {
       filters = { ...filters, creator: new ObjectId(representative) };
     }
 
-    const dateAfterThreeDays = new Date();
-    dateAfterThreeDays.setDate(dateAfterThreeDays.getDate() + 2); // Added 3 days to today's date
-    const dateAfterFortyFiveDays = new Date();
-    dateAfterFortyFiveDays.setDate(dateAfterFortyFiveDays.getDate() + 44); // Added 45 days to today's date
+    // const dateAfterThreeDays = new Date();
+    // dateAfterThreeDays.setDate(dateAfterThreeDays.getDate() + 2); // Added 3 days to today's date
+    // const dateAfterFortyFiveDays = new Date();
+    // dateAfterFortyFiveDays.setDate(dateAfterFortyFiveDays.getDate() + 44); // Added 45 days to today's date
+    var today = new Date(); // Get today's date
+    today.setHours(0, 0, 0, 0);
 
     console.log("query: ", requestQuery, requestQuery.stageList, filters);
     const searchQry: any[] =
@@ -314,14 +323,39 @@ export const getRepresentativeTickets = PromiseWrapper(
                   ]
                 : [
                     {
-                      modifiedDate: {
-                        $gt: dateAfterThreeDays,
-
-                        $lt: dateAfterFortyFiveDays,
-                      },
-                    },
-                    {
                       modifiedDate: null,
+                    },
+
+                    {
+                      $and: [
+                        {
+                          $expr: {
+                            $gt: [
+                              today,
+                              {
+                                $add: [
+                                  "$modifiedDate",
+                                  3 * 24 * 60 * 60 * 1000,
+                                ],
+                              },
+                            ],
+                          },
+                        },
+                        {
+                          $expr: {
+                            $lt: [
+                              today,
+                              {
+                                $add: [
+                                  "$modifiedDate",
+                                  45 * 24 * 60 * 60 * 1000,
+                                ],
+                              },
+                              
+                            ],
+                          },
+                        },
+                      ],
                     },
                   ],
           },
