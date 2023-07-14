@@ -263,12 +263,7 @@ export const getRepresentativeTickets = PromiseWrapper(
       filters = { ...filters, stage: { $in: stageList } };
     }
 
-    console.log(
-      "stagelist =>",
-      stageList,
-      typeof representative,
-      representative === "null"
-    );
+
 
     if (representative !== undefined && representative !== "null") {
       filters = { ...filters, creator: new ObjectId(representative) };
@@ -281,7 +276,7 @@ export const getRepresentativeTickets = PromiseWrapper(
     var today = new Date(); // Get today's date
     today.setHours(0, 0, 0, 0);
 
-    console.log("query: ", requestQuery, requestQuery.stageList, filters);
+    console.log("query: ", requestQuery);
     const searchQry: any[] =
       requestQuery?.name !== UNDEFINED ? [requestQuery.name] : [];
 
@@ -488,8 +483,11 @@ export const createEstimateController = PromiseWrapper(
 
     const ticketData: iTicket | null = await findOneTicket(estimateBody.ticket);
 
+    console.log("ticket data", ticketData);
+
     if (ticketData !== null) {
       if (ticketData?.subStageCode.code < 2) {
+        console.log("Im in estimation")
         const result = await updateSubStage(
           estimateBody.ticket,
           {

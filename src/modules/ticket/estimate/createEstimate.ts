@@ -100,7 +100,7 @@ const generateEstimate = async (
       // console.log(roomCharge , "this is icu")
     }
     if (item.charges) {
-      roomCharge += item.charges.roomRent * estimate.wardDays;
+      roomCharge += item.charges[0].roomRent * estimate.wardDays;
       console.log(roomCharge, " this ward roomCharge");
     }
     
